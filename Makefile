@@ -14,7 +14,7 @@ build: dependencies
 	docker build -t cob/bton .
 
 push:
-	#docker tag eGovPortal docker-repo.bloomington.in.gov/cob/eGovPortal:${VERSION}-${COMMIT}
+	#docker tag Bton docker-repo.bloomington.in.gov/cob/Bton:${VERSION}-${COMMIT}
 	docker tag cob/bton docker-repo.bloomington.in.gov/cob/bton:${VERSION}
-	#docker push docker-repo.bloomington.in.gov/cob/eGovPortal:${VERSION}-${COMMIT}
+	#docker push docker-repo.bloomington.in.gov/cob/Bton:${VERSION}-${COMMIT}
 	docker push docker-repo.bloomington.in.gov/cob/bton:${VERSION}

@@ -12,7 +12,7 @@ deployments:
   namespace: production
   helm:
     chart:
-      name: ./charts/eGovPortal
+      name: ./charts/Bton
     values:
       environment:
         NODE_ENV: production
@@ -25,7 +25,7 @@ deployments:
           paths: 
             - /egov
     valuesFiles:
-    - ./charts/eGovPortal/cob.values.yaml
+    - ./charts/Bton/cob.values.yaml
     replaceImageTags: false
     v2: false
     

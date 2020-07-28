@@ -60,7 +60,7 @@ app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 
 app.get('/', (req, res) => {
-  res.json({ data: 'eGovPortal API' });
+  res.json({ data: 'Bton API' });
 });
 
 https.createServer({
