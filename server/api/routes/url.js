@@ -10,7 +10,7 @@ const { urls } = require('../models/url'),
 import { nanoid } from 'nanoid'
 
 // Get all URLs in the system.      
-router.get('/urls', authRole(roles.default), async (req, res) => {
+router.get('/urls', authRole(roles.admin, roles.default), async (req, res) => {
   try {
     let result = await urls.find().exec();
     res.send(result);
@@ -19,7 +19,7 @@ router.get('/urls', authRole(roles.default), async (req, res) => {
   }
 });
 
-router.get('/url/:id', authRole(roles.default), (req, res) => {
+router.get('/url/:id', authRole(roles.admin, roles.default), (req, res) => {
 
   urls.find({
     "originalUrl": {
@@ -33,7 +33,7 @@ router.get('/url/:id', authRole(roles.default), (req, res) => {
     .catch((err) => { res.status(200).json('URL not found') })
 });
 
-router.post('/url', authRole(roles.default), (req, res) => {
+router.post('/url', authRole(roles.admin, roles.default), (req, res) => {
   if (validUrl.isUri(req.body.url)) {
     console.log('Valid Base Url format');
 
@@ -62,7 +62,7 @@ router.post('/url', authRole(roles.default), (req, res) => {
   }
 });
 
-router.get('/short/:id', authRole(roles.default), (req, res) => {
+router.get('/short/:id', authRole(roles.admin, roles.default), (req, res) => {
   urls.findOne({ urlCode: req.params.id })
     .then((url) => {
       res.status(200).json(url.originalUrl);
@@ -73,7 +73,7 @@ router.get('/short/:id', authRole(roles.default), (req, res) => {
 });
 
 // Delete a short URL in the system by ID.      
-router.delete('/short/:id', authRole(roles.default), (req, res) => {
+router.delete('/short/:id', authRole(roles.admin), (req, res) => {
   urls.find({ _id: req.params.id })
     .deleteOne()
     .then((urlres) => { res.status(200).json({ message: 'Removed' }) })

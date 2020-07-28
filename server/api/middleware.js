@@ -1,16 +1,5 @@
 require('dotenv').config();
 
-// const shortid = require("shortid");
-
-const authRole = (role) => (req, res, next) => {
-  let isUser = req.session.user;
-
-  if (!isUser || req.session.user.role !== role)
-    return res.status(401).json('Unauthorized')
-
-  next()
-};
-
 const redirectHome = (req, res, next) => {
   if (req.session.user)
     res.redirect(process.env.CLIENT_HOST);
@@ -18,10 +7,21 @@ const redirectHome = (req, res, next) => {
   next()
 };
 
+const authRole = (...roles) => (req, res, next) => {
+  if (!req.session.user) {
+    return res.status(401).json('Unauthorized')
+  }
+
+  const hasRole = roles.find(role => req.session.user.role === role);
+
+  if (!hasRole) {
+    return res.status(401).json('Unauthorized')
+  }
+
+  next()
+}
+
 module.exports = {
   authRole,
-  redirectHome,
-  // generate: function () {
-  //   return shortid.generate();
-  // }
+  redirectHome
 }
