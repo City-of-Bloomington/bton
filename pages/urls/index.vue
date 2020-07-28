@@ -3,7 +3,6 @@
     <div class="form-wrapper">
       <form @submit.prevent @keyup.enter="searchEntered()">
         <label for="address-search" class="sr-only">Address Search</label>
-        <p>{{ searchHasFocus }}</p>
         <exampleSearch
           v-model="addressSearchAuto"
           v-on:focusd="sFocus()"
@@ -16,7 +15,31 @@
       </form>
     </div>
 
-    <fn1-tabs v-if="urls">
+    <div class="search-results" v-if="addressSearchAutoRes && searchHasFocus">
+      <table>
+        <thead>
+          <tr>
+            <th>Originals</th>
+            <th>Shorts</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr v-for="r, i in addressSearchAutoRes" :key="r._id">
+            <td>{{ r.originalUrl }}</td>
+            <td>{{ r.shortUrl }}</td>
+            <td>
+              <input type="hidden" :id="`short-url-copy-${i}`" :value="r.shortUrl" />
+              <button class="btn copy" @click="copyTestingCode(i)">copy</button>
+              <!-- <button class="btn" @click="deleteURL(u._id)">delete</button> -->
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <fn1-tabs v-if="urls && !searchHasFocus">
       <fn1-tab name="Your Urls" :selected="true">
         <table v-if="usersUrls.length">
           <thead>
@@ -104,13 +127,23 @@ export default {
     return {
       urls: null,
       addressSearchAuto: null,
+      addressSearchAutoRes: null,
       searchHasFocus: false,
     };
   },
   watch: {
     addressSearchAuto: debounce(function (val, oldVal) {
       if (this.addressSearchAuto) {
-        console.log("cool");
+        this.$axios
+          .$get(`${process.env.apiHost}/api/url/${this.addressSearchAuto}`, {
+            withCredentials: true,
+          })
+          .then((res) => {
+            this.addressSearchAutoRes = res;
+          })
+          .catch((err) => {
+            console.log("Get URL Fail -", err);
+          });
       } else {
         this.autoSuggestRes = null;
       }
@@ -123,7 +156,7 @@ export default {
     sBlur() {
       setTimeout(() => {
         this.searchHasFocus = false;
-      }, 500);
+      }, 200);
     },
     deleteURL(id) {
       this.$axios
@@ -182,6 +215,14 @@ main {
 
   table {
     color: $text-color;
+  }
+
+  .search-results {
+    margin: 20px 0 0 0;
+  }
+
+  .tabs-group {
+    margin: 20px 0 0 0;
   }
 }
 </style>

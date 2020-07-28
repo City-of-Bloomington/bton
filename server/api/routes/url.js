@@ -19,6 +19,20 @@ router.get('/urls', authRole(roles.default), async (req, res) => {
   }
 });
 
+router.get('/url/:id', authRole(roles.default), (req, res) => {
+
+  urls.find({
+    "originalUrl": {
+      "$regex": req.params.id,
+      "$options": "i"
+    }
+  })
+    .then((url) => {
+      res.status(200).json(url)
+    })
+    .catch((err) => { res.status(200).json('URL not found') })
+});
+
 router.post('/url', authRole(roles.default), (req, res) => {
   if (validUrl.isUri(req.body.url)) {
     console.log('Valid Base Url format');
@@ -48,7 +62,7 @@ router.post('/url', authRole(roles.default), (req, res) => {
   }
 });
 
-router.get('/short/:id', (req, res) => {
+router.get('/short/:id', authRole(roles.default), (req, res) => {
   urls.findOne({ urlCode: req.params.id })
     .then((url) => {
       res.status(200).json(url.originalUrl);
