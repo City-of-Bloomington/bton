@@ -1,0 +1,77 @@
+/* Import Components */
+/* @import 'forms.scss'; */
+
+/* Global */
+*, *:before, *:after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+#__nuxt {
+  height: 100%;
+}
+
+body {
+  overscroll-behavior-y: none;
+  position: relative;
+  min-height: 100%;
+}
+
+html {
+  font-family: $font-text;
+  font-size: 100%;
+  -ms-text-size-adjust: 100%; 
+  -webkit-text-size-adjust: 100%;
+  font-size: 20px;
+  word-spacing: 1px;
+  color: white;
+  height: 100%;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: lighten($color-grey-light, 6%);
+}
+
+nav {
+  &.breadcrumbs {
+    a {
+      color: lighten($text-color, 25%);
+      font-weight: 600;
+
+      &:hover,
+      &:focus {
+        color: $color-blue;
+      }
+
+      &.active {
+        color: $text-color;
+      }
+    }
+  }
+}
+
+.container {
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    width: 750px;
+  }
+
+  @media (min-width: 992px) {
+    width: 971px;
+  }
+
+  @media (min-width: 1300px) {
+    width: 1280px;
+  }
+}
+
+.row {
+  margin: 0 auto 30px auto;
+}

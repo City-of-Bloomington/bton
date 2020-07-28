@@ -1,0 +1,60 @@
+version: v1beta5
+images:
+  egov-portal:
+    image: docker-repo.bloomington.in.gov/cob/egov-portal
+    tag: ds-${DEVSPACE_TIMESTAMP}
+    dockerfile: ./Dockerfile
+    build:
+      disabled: false
+deployments:
+# dev deployment handled by patches
+- name: egov-portal
+  namespace: production
+  helm:
+    chart:
+      name: ./charts/eGovPortal
+    values:
+      environment:
+        NODE_ENV: production
+      image:
+        npmscript: build+start
+        tag: ds-${DEVSPACE_TIMESTAMP}
+      ingress:
+        hosts:
+        - host: kubeproxy.bloomington.in.gov
+          paths: 
+            - /egov
+    valuesFiles:
+    - ./charts/eGovPortal/cob.values.yaml
+    replaceImageTags: false
+    v2: false
+    
+profiles:
+- name: prod
+  patches:
+
+  - op: replace
+    path: images.egov-portal.tag
+    value: latest
+  - op: replace
+    path: deployments[0].helm.values.image.tag
+    value: latest
+  
+
+- name: dev
+  patches:
+  - op: replace
+    path: deployments[0].namespace
+    value: dev
+
+  - op: replace
+    path: deployments[0].helm.values.environment.NODE_ENV
+    value: development
+
+  - op: replace
+    path: deployments[0].helm.values.ingress.hosts[0].host
+    value: egov.bloomington.dev
+
+  - op: replace
+    path: deployments[0].helm.values.ingress.hosts[0].paths[0]
+    value: /

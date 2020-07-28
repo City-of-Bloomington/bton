@@ -1,0 +1,72 @@
+[
+  {
+    "appName": "uReport",
+    "department": "ITS",
+    "role": "Public",
+    "shortBody": "Notify the City of community issues.",
+    "body": "Notify the City of community issues, such as potholes, graffiti, malfunctioning street lights, and more.",
+    "sections": [
+      {
+        "heading": "Non-Emergency Use Only",
+        "body": "This system is not for reporting emergencies or imminent safety hazards.\\n\\nIf this is an emergency, please dial 911."
+      },
+      {
+        "heading": "Public Record",
+        "body": "Information you provide through uReport is stored and retained by the City as a public record."
+      }
+    ]
+  },
+  {
+    "appName": "myBloomington",
+    "department": "ITS",
+    "role": "Public",
+    "shortBody": "myBloomington provides information related to a given Street Address.",
+    "body": "myBloomington is a service offered by the City of Bloomington, Indiana ITS Department to find local information related to a street address. The information reported comes from the City of Bloomington Geographic Information System (GIS) and other related databases.",
+    "sections": []
+  },
+  {
+    "appName": "Incident Reports",
+    "department": "ITS",
+    "role": "Public",
+    "shortBody": "Notify the City of community issues.",
+    "body":"Some incidents may be reported online through our Online Incident Reporting system. If the incident does not meet the reporting system requirements, call (812) 339-4477. Advise the call taker that you want to report an incident. They will take necessary information from you.\\n\\nAn officer will then come to your location or call you by telephone, depending on the nature of the incident. You may also file a report in person at BPD,220 East 3rd Street. Reports can be made twenty-four hours a day, seven days a week.",
+    "sections": [
+    {
+      "heading": "How to file a traffic accident report",
+      "body": "Call 911 for emergencies. For non-emergencies, call (812) 339-4477. The call taker will need to know if anyone is injured and the type of injuries. Also report the location and the number and types of vehicles involved. The call taker will determine which emergency personnel are needed and send them to your location.\\n\\nPlease have your driver's license, vehicle registration, and vehicle insurance card ready to present to the officer when he/she arrives. The officer will investigate the accident and file a police report if necessary under state law.\\n\\nIf you are involved in a minor damage accident (combined damage estimate of all vehicles involved is less than $1000), drivers are not required to call the police. Drivers should exchange the following information before leaving the scene: name, address, telephone number, driver's license number, vehicle information including license plate, and vehicle insurance company name, policy number, and telephone number."
+    },
+    {
+      "heading": "Criminal History Checks",
+      "body": "To request a limited criminal history on yourself or a potential employee, print the Request for Limited Criminal History (PDF) form. Complete and sign the form, then mail the form to the Bloomington Police Department, 220 E 3rd St, Bloomington, IN 47401, along with a check or money order for the fee of seven dollars ($7). Include a self-addressed, postage-paid envelope so the requested information can be returned to you. You may also request the limited criminal history in person at the Bloomington Police Department Monday through Friday, 8:00am-4:00pm."
+    },
+    {
+      "heading": "Obtaining Public Records",
+      "body": "To obtain a copy of a police report, request statistical information, request photos or recordings, or any other police record other than a car accident, please complete the Public Access Request form."
+    }
+  ]
+  },
+  {
+    "appName": "Time Track",
+    "department": "ITS",
+    "role": "Staff",
+    "shortBody": "Digital time keeping system, web and kiosk based.",
+    "body": "Timetrack is a web application to handle an organization's employees' time keeping data. It is designed so that some employees will use their ID card to scan their clock-in and clock-out times. Others will be able to enter their time-in and time-out using the web interface directly. The system is designed to have two level approval process. The first is the group manager approval then the final approval is the director approval named 'Payroll Process Approval'. Currently the application handles two weeks pay period.",
+    "sections": []
+  },
+  {
+    "appName": "uReport CRM",
+    "department": "ITS",
+    "role": "Staff",
+    "shortBody": "uReport service request tracker/CRM.",
+    "body": "uReport is a CRM web application with an Open311 (GeoReport v2) endpoint that should meet the needs of smaller municipalities wishing to deploy Open311 and/or a lightweight constituent management tool.",
+    "sections": []
+  },
+  {
+    "appName": "OnBoard",
+    "department": "ITS",
+    "role": "Staff",
+    "shortBody": "Manage board and commission information.",
+    "body": "An extensible web application to keep track of boards & commissions details, the people appointed to those groups, any legislation they write, and the voting records of each committee member.\\n\\nThe City of Bloomington uses this application to track information about our boards & commissions.",
+    "sections": []
+  }
+]
