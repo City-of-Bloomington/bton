@@ -63,7 +63,13 @@ router.post('/url', authRole(roles.admin, roles.default), (req, res) => {
 });
 
 router.get('/short/:id', (req, res) => {
-  urls.findOne({ urlCode: req.params.id })
+  let countBy = 1;
+
+  urls.findOneAndUpdate({ urlCode: req.params.id }, {
+    $inc: {
+      hits: countBy
+    }
+  })
     .then((url) => {
       res.status(200).json(url.originalUrl);
     })
