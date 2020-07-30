@@ -19,7 +19,7 @@ router.get('/urls', authRole(roles.admin, roles.default), async (req, res) => {
   }
 });
 
-router.get('/url/:id', authRole(roles.admin, roles.default), (req, res) => {
+router.get('/url/:id', (req, res) => {
 
   urls.find({
     "originalUrl": {
@@ -62,7 +62,7 @@ router.post('/url', authRole(roles.admin, roles.default), (req, res) => {
   }
 });
 
-router.get('/short/:id', authRole(roles.admin, roles.default), (req, res) => {
+router.get('/short/:id', (req, res) => {
   urls.findOne({ urlCode: req.params.id })
     .then((url) => {
       res.status(200).json(url.originalUrl);

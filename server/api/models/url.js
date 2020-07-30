@@ -6,6 +6,7 @@ const urlsSchema = new Schema({
   originalUrl: String,
   urlCode: String,
   shortUrl: String,
+  hits: { type: Number, default: 0 },
   createdDate: { type: Date, default: Date.now },
   updatedDate: { type: Date, default: Date.now }
 });
