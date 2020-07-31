@@ -19,6 +19,7 @@
       <table>
         <thead>
           <tr>
+            <!-- <th>Hits</th> -->
             <th>Originals</th>
             <th>Shorts</th>
             <th>Actions</th>
@@ -27,6 +28,7 @@
 
         <tbody>
           <tr v-for="r, i in addressSearchAutoRes" :key="r._id">
+            <!-- <td>{{ r.hits }}</td> -->
             <td>{{ r.originalUrl }}</td>
             <td>{{ r.shortUrl }}</td>
             <td>
@@ -42,6 +44,7 @@
         <table v-if="usersUrls.length">
           <thead>
             <tr>
+              <!-- <th>Hits</th> -->
               <th>Originals</th>
               <th>Shorts</th>
               <th>Actions</th>
@@ -50,6 +53,7 @@
 
           <tbody>
             <tr v-for="u, i in usersUrls" :key="u._id">
+              <!-- <td>{{ u.hits }}</td> -->
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td>
@@ -68,6 +72,7 @@
         <table v-if="urls.length">
           <thead>
             <tr>
+              <!-- <th>Hits</th> -->
               <th>Originals</th>
               <th>Shorts</th>
               <th>Actions</th>
@@ -76,6 +81,7 @@
 
           <tbody>
             <tr v-for="u, i in urls" :key="u._id">
+              <!-- <td>{{ u.hits }}</td> -->
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td>
