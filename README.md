@@ -2,7 +2,7 @@
 
 > Shorten City of Bloomington URLs using Bton.
 
-![Bton Short Urls](https://raw.githubusercontent.com/City-of-Bloomington/bton/5cdadffd972d486b642d9f01856c9b08803183ea/static/screenshot.png)
+![Bton Short Urls](https://raw.githubusercontent.com/City-of-Bloomington/bton/b40157fe6a43702018bceb46573828fd741420ad/static/screenshot.png)
 
 ## Build Setup
 
