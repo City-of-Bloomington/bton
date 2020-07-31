@@ -11,9 +11,7 @@
         url:          `/`
       }"
       :navItems="[
-        { name:       'Feedback',
-          href:       `${cityWebsiteUrl}/ureport/miscellaneous/53`,
-          target:     '_blank' },
+        
         { name:       'URLs',
           href:       `/urls`}
       ]"
@@ -31,6 +29,9 @@
         text="Menu"
         navAlign="right"
         :navItems="[
+          { name:       'Feedback',
+          href:       `${cityWebsiteUrl}/ureport/miscellaneous/53`,
+          target:     '_blank' },
           {name: 'Settings',  href: `${client}/settings/`},
           {name: 'Logout',    href: `${api}/auth/logout/`},
         ]"
