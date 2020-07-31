@@ -15,7 +15,10 @@
         >
           <template v-if="createPostMessage.error">{{ createPostMessage.error }}</template>
 
-          <template v-if="createPostMessage.success">{{ createPostMessage.success.shortUrl }}</template>
+          <template v-if="createPostMessage.success">
+            {{ createPostMessage.success.shortUrl }}
+            <clickToCopy :id="0" :value="createPostMessage.success.shortUrl" />
+          </template>
         </fn1-alert>
 
         <div class="field-group">
@@ -37,10 +40,11 @@
 
 <script>
 import { mapFields } from "vuex-map-fields";
+import clickToCopy from "~/components/design-system/clickToCopy.vue";
 
 export default {
   mounted() {},
-  components: {},
+  components: { clickToCopy },
   middleware: "authenticated",
   data() {
     return {
@@ -117,6 +121,15 @@ main {
   width: 420px;
   margin: 0 auto;
   top: 150px;
+
+  .alert {
+    display: flex;
+    align-items: center;
+
+    .click-to-copy-wrapper {
+      margin: 0 0 0 auto;
+    }
+  }
 
   section {
     &.search {

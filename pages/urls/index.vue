@@ -30,9 +30,7 @@
             <td>{{ r.originalUrl }}</td>
             <td>{{ r.shortUrl }}</td>
             <td>
-              <input type="hidden" :id="`short-url-copy-${i}`" :value="r.shortUrl" />
-              <button class="btn copy" @click="copyTestingCode(i)">copy</button>
-              <!-- <button class="btn" @click="deleteURL(u._id)">delete</button> -->
+              <clickToCopy :id="i" :value="r.shortUrl" />
             </td>
           </tr>
         </tbody>
@@ -55,9 +53,7 @@
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td>
-                <input type="hidden" :id="`short-url-copy-${i}`" :value="u.shortUrl" />
-                <button class="btn copy" @click="copyTestingCode(i)">copy</button>
-                <!-- <button class="btn" @click="deleteURL(u._id)">delete</button> -->
+                <clickToCopy :id="i" :value="u.shortUrl" />
               </td>
             </tr>
           </tbody>
@@ -83,9 +79,7 @@
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td>
-                <input type="hidden" :id="`short-url-copy-${i}`" :value="u.shortUrl" />
-                <button class="btn copy" @click="copyTestingCode(i)">copy</button>
-                <!-- <button class="btn" @click="deleteURL(u._id)">delete</button> -->
+                <clickToCopy :id="i" :value="u.shortUrl" />
               </td>
             </tr>
           </tbody>
@@ -102,6 +96,7 @@
 <script>
 import { mapFields } from "vuex-map-fields";
 import exampleSearch from "~/components/design-system/exampleSearch";
+import clickToCopy from "~/components/design-system/clickToCopy.vue";
 
 import debounce from "lodash.debounce";
 
@@ -121,7 +116,7 @@ export default {
     });
   },
   mounted() {},
-  components: { exampleSearch },
+  components: { exampleSearch, clickToCopy },
   middleware: "authenticated",
   data() {
     return {
@@ -169,28 +164,6 @@ export default {
         .catch((err) => {
           console.log("rm fail", err);
         });
-    },
-    copyUrl(url) {
-      url.execCommand("copy");
-    },
-    copyTestingCode(id) {
-      let testingCodeToCopy = document.querySelector(`#short-url-copy-${id}`);
-      testingCodeToCopy.setAttribute("type", "text");
-      testingCodeToCopy.select();
-
-      try {
-        let successful = document.execCommand("copy");
-        alert(
-          `Short URL copied:\n ${JSON.parse(
-            JSON.stringify(testingCodeToCopy._value)
-          )}`
-        );
-      } catch (err) {
-        alert("Oops, unable to copy");
-      }
-
-      testingCodeToCopy.setAttribute("type", "hidden");
-      window.getSelection().removeAllRanges();
     },
   },
   computed: {
