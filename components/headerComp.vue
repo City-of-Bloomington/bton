@@ -6,10 +6,6 @@
         image:        `${headerLogo}`,
         imageAlt:     `${cityName}`
       }"
-      :logoHeadings="{
-        topHeading:   `${logoHeading}`,
-        subHeading:   `${logoSubHeading}`,
-      }"
       :application="{
         name:         `${appName}`,
         url:          `/`
@@ -56,7 +52,7 @@ export default {
       api: process.env.apiHost,
       cityWebsiteUrl: process.env.CITY_WEBSITE_URL,
       cityName: process.env.CITY_NAME,
-      headerLogo: require("../assets/images/city-of-bloomington-logo.svg"),
+      headerLogo: require("../assets/images/cob-logo-horizontal.svg"),
       logoHeading: process.env.LOGO_HEADING,
       logoSubHeading: process.env.LOGO_SUB_HEADING,
     };
