@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bton
+  labels:
+    app.kubernetes.io/name: bton
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bton
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bton
+    spec:
+      containers:
+        - name: bton
+          image: "docker-repo.bloomington.in.gov/cob/bton:dev"
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3001
+            failureThreshold: 30
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3001
+            failureThreshold: 30
+            periodSeconds: 30
+          startupProbe:
+            httpGet:
+              path: /
+              port: 3001
+            failureThreshold: 30
+            periodSeconds: 30
+          envFrom:
+          - configMapRef:
+              name: bton-env
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+            - name: api
+              containerPort: 3001
+              protocol: TCP
+        
+          # resources:
+          #   requests:
+          #     memory: "128Mi"
+          #     cpu: "1"
+          #   limits:
+          #     memory: "256Mi"
+          #     cpu: "2"
+
+              
