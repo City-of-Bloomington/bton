@@ -4,6 +4,8 @@ const express = require('express'),
   app = express(),
   fs = require('fs'),
   https = require('https'),
+  http  = require('http'),
+  isKube = (process.env.NODE_KUBE === 'true'),
   bodyParser = require('body-parser'),
   cookieParser = require('cookie-parser'),
   session = require('express-session'),
@@ -63,12 +65,25 @@ app.get('/', (req, res) => {
   res.json({ data: 'Bton API' });
 });
 
-https.createServer({
-  key: fs.readFileSync(process.env.CERT_KEY_PATH, 'utf8'),
-  cert: fs.readFileSync(process.env.CERT_CRT_PATH, 'utf8')
-}, app)
-  .listen(process.env.API_PORT, () => {
-    console.log('\n\n✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨',
-      `\n✨✨✨✨✨API SERVER @ ${process.env.API_PORT} ✨✨✨✨`,
-      '\n✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨\n\n');
-  })
+
+// SETH EDIT: check whether the app is running inside of a container, launch http server if so
+if (isKube) {
+  app.set('trust proxy', 1) // allow app to function behind ingress controller
+  http.createServer(app)
+    .listen(process.env.API_PORT, () => {
+      console.log('\n\n✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨',
+        `\n✨✨✨✨✨API SERVER (HTTP) @ ${process.env.API_PORT} ✨✨✨✨`,
+        '\n✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨\n\n');
+    })
+}
+else {
+  https.createServer({
+    key: fs.readFileSync(process.env.CERT_KEY_PATH, 'utf8'),
+    cert: fs.readFileSync(process.env.CERT_CRT_PATH, 'utf8')
+  }, app)
+    .listen(process.env.API_PORT, () => {
+      console.log('\n\n✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨',
+        `\n✨✨✨✨✨API SERVER @ ${process.env.API_PORT} ✨✨✨✨`,
+        '\n✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨\n\n');
+    })
+}
