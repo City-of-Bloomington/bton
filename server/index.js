@@ -6,15 +6,14 @@ const  pkg = require('../package'),
   Builder } = require('nuxt'),
      config = require('../nuxt.config.js'),
       https = require('https'),
+      http  = require('http'),
          fs = require('fs'),
      isProd = (process.env.NODE_ENV === 'production'),
+     isKube = (process.env.NODE_KUBE === 'true'),
        nuxt = new Nuxt(config);
 
 config.dev = !isProd;
 
-let options = {
-  key:  fs.readFileSync(process.env.CERT_KEY_PATH, 'utf8'),
-  cert: fs.readFileSync(process.env.CERT_CRT_PATH, 'utf8')},
 envMsg          = config.dev ? 'Development' : 'Production',
 dividerMsg = `🌹\xa0\xa0🌹\xa0\xa0🌹\xa0\xa0🛠️\xa0\xa0⛓️\xa0\xa0👩‍💻\xa0🔮\xa0👨‍💻\xa0⛓️\xa0\xa0🛠️\xa0\xa0🌹\xa0\xa0🌹\xa0\xa0🌹`,
 dividerStars    = `★\xa0\xa0`,
@@ -31,7 +30,22 @@ if (config.dev) {
 } else { listen() }
 
 function listen() {
-  https.createServer(options, nuxt.render).listen(process.env.NUXT_PORT);
+  // SETH EDIT: check whether the app is running inside of a container, launch http server if so
+  if (isKube) {
+    console.log(`\nLAUNCHING IN HTTP MODE DUE TO RUNNING IN CONTAINER\n`)
+    http.createServer(nuxt.render).listen(process.env.NUXT_PORT);
+    
+  }
+  else {
+     // SETH EDIT: the certs won't exist in a contianer, moved the attempt to read them down here
+     console.log(`\nLAUNCHING IN HTTPS MODE\n`)
+    let options = {
+      key:  fs.readFileSync(process.env.CERT_KEY_PATH, 'utf8'),
+      cert: fs.readFileSync(process.env.CERT_CRT_PATH, 'utf8')
+    };
+    https.createServer(options, nuxt.render).listen(process.env.NUXT_PORT);
+  }
+  
 
   console.log(`\n\n${dividerMsg}\n`
     + `${dividerStars.repeat(starRepeatCount)}\n`
