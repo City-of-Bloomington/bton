@@ -1,0 +1,13 @@
+---
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: bton
+  name: bton-env
+apiVersion: v1
+data:
+  API_HOST: https://bton.in
+  CLIENT_HOST: https://bton.in
+  MONGODB_HOST: mongodb://mongo.bloomington.in.gov:27017/bton
+  HOSTNAME: bton.in
+...

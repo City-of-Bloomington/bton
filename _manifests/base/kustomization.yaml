@@ -2,14 +2,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 # manifests are in the _manifests folder just to keep things clean
-- _manifests/deployment.yaml
-- _manifests/ingress.yaml
-- _manifests/service.yaml
+- deployment.yaml
+- ingress.yaml
+- service.yaml
 
 # this could maybe just be pointed to .env depending on how adam wants to develop
 configMapGenerator:
 - name: bton-env
   env: .env-kubernetes
+    
 
 generatorOptions:
 # labels to add to all generated resources
