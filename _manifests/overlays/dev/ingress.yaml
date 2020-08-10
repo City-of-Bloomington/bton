@@ -1,0 +1,27 @@
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: bton
+
+spec:
+  tls:
+    - hosts:
+        - "bton.bloomington.dev"
+      secretName: cert-btonbloomdev
+  rules:
+    - host: "bton.bloomington.dev"
+      http:
+        paths:
+          - path: /api
+            backend:
+              serviceName: bton
+              servicePort: 3001
+          - path: /auth
+            backend:
+              serviceName: bton
+              servicePort: 3001
+          - path: /
+            backend:
+              serviceName: bton
+              servicePort: 3000

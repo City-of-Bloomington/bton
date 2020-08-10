@@ -11,10 +11,10 @@ metadata:
 spec:
   tls:
     - hosts:
-        - "bton.in"
+        - "bton.bloomington.dev"
       secretName: cert-btondotin
   rules:
-    - host: "bton.in"
+    - host: "bton.bloomington.dev"
       http:
         paths:
           - path: /api

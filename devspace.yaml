@@ -4,7 +4,6 @@ images:
     image: docker-repo.bloomington.in.gov/cob/bton
     tags:
     - dev
-    - latest
     dockerfile: ./Dockerfile
     createPullSecret: false
     preferSyncOverRebuild: true
@@ -14,22 +13,54 @@ deployments:
 - name: bton
   namespace: dev
   kubectl:
-    manifests: # this loads kustomization.yaml in the root dir
-    - .
+    manifests:
+    - _manifests/base
     kustomize: true
     replaceImageTags: false
-
+    
 profiles:
 - name: prod
-  patches:
-  - op: replace
-    path: deployments[0].namespace
-    value: production
-  - op: replace
-    path: images.egov-portal.tag
-    value: latest
+  replace:
+    deployments:
+      - name: bton
+        namespace: prod
+        kubectl:
+          manifests:
+          - _manifests/overlays/prod
+          kustomize: true
+          replaceImageTags: true
+    images:
+      bton:
+        image: docker-repo.bloomington.in.gov/cob/bton
+        tags:
+        - ds-${DEVSPACE_GIT_COMMIT}
+        - prod-latest
+        dockerfile: ./Dockerfile
+        createPullSecret: false
+        preferSyncOverRebuild: true
+        build:
+          disabled: false
+
 - name: dev
-  patches:
-  - op: replace
-    path: deployments[0].namespace
-    value: dev
+  replace:
+    deployments:
+      - name: bton
+        namespace: dev
+        kubectl:
+          manifests:
+          - _manifests/overlays/dev
+          kustomize: true
+          replaceImageTags: true
+    images:
+      bton:
+        image: docker-repo.bloomington.in.gov/cob/bton
+        tags:
+        - dev
+        - latest
+        - ds-${DEVSPACE_GIT_COMMIT}
+        dockerfile: ./Dockerfile
+        createPullSecret: false
+        preferSyncOverRebuild: true
+        build:
+          disabled: false
+

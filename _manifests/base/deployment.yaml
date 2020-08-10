@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: bton
-          image: "docker-repo.bloomington.in.gov/cob/bton:dev"
+          image: "docker-repo.bloomington.in.gov/cob/bton:devspaceImageAutoFill"
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
