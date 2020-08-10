@@ -44,7 +44,7 @@
         <table v-if="usersUrls.length">
           <thead>
             <tr>
-              <!-- <th>Hits</th> -->
+              <th>Hits</th>
               <th>Originals</th>
               <th>Shorts</th>
               <th>Actions</th>
@@ -53,7 +53,7 @@
 
           <tbody>
             <tr v-for="u, i in usersUrls" :key="u._id">
-              <!-- <td>{{ u.hits }}</td> -->
+              <td>{{ u.hits }}</td>
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td>

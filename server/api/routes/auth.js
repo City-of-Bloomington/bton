@@ -30,24 +30,30 @@ router.get('/verify', (req, res, next) => {
           user: response.data.serviceResponse.authenticationSuccess.user
         };
 
+        console.log('VERIFIED req.session.user', req.session.user);
+        console.log('VERIFIED req.session.user.user', req.session.user.user);
+
         users.findOne({ username: req.session.user.user })
           .then((currentUser) => {
             if (currentUser) {
-              req.session.isLoggedIn = true;
+              console.log('CurrentUser,', currentUser)
 
+              req.session.isLoggedIn = true;
 
               let update = {
                 lastLoginDate: new Date(),
               };
 
-              users.findOneAndUpdate(currentUser.username, update, { new: true }, function (err, res) {
-                if (err) {
-                  console.log('findOneAndUpdate e', err);
-                } else {
-                  req.session.user = res;
-                  req.session.save();
-                }
-              });
+              // users.findOneAndUpdate(currentUser.username, update, { new: true }, function (err, res) {
+              //   if (err) {
+              //     console.log('findOneAndUpdate e', err);
+              //   } else {
+              //     console.log('find and UPDATE,', res);
+              //   }
+              // });
+
+              req.session.user = currentUser;
+              req.session.save();
             } else {
               const newUser = new users({
                 dateCreated: new Date(),
@@ -87,6 +93,10 @@ router.get('/verify', (req, res, next) => {
 
 
 router.get('/user', (req, res) => {
+  console.log('req.session', req.session);
+  console.log('req.session.user', req.session.user);
+  // console.log('req.session.user.user', req.session.user.user);
+
   if (req.session.user) {
     res.status(200).json({
       isLoggedIn: req.session.isLoggedIn,
@@ -124,12 +134,15 @@ router.post('/user', authRole(roles.admin), (req, res) => {
 router.get('/logout', (req, res) => {
   req.session.destroy((err) => {
     if (err) {
+      console.log('logout err', err)
       return res.redirect(process.env.CLIENT_HOST);
     }
 
-    res.clearCookie('sid');
-    res.redirect(process.env.CLIENT_HOST);
-  })
+    res.clearCookie(process.env.SESSION_NAME);
+    res.redirect(`${process.env.CITY_WEBSITE_URL}/cas/logout?url=${process.env.CLIENT_HOST}`);
+  });
+
+  console.log('loggedout', req.session)
 });
 
 module.exports = router;
