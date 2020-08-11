@@ -71,39 +71,40 @@ router.get('/short/:id', (req, res) => {
       hits: countBy
     }
   })
-    .then((url) =>
+    .then((url) => {
+
       let updateBy = { urlCode: url.urlCode },
-      update = {
-        "$push": {
-          hitDates: new Date(),
-        }
-      };
+        update = {
+          "$push": {
+            hitDates: new Date(),
+          }
+        };
 
-  counter.findOneAndUpdate(updateBy, update, { new: true }, (counterErr, counterRes) => {
-    if (counterErr) {
-      console.log('counter findOneAndUpdate fail', counterErr);
-    } else {
-      if (!counterRes) {
-        const newCounter = new counter({
-          hitDates: new Date(),
-          urlCode: url.urlCode,
-          originalUrl: url.originalUrl,
-        });
+      counter.findOneAndUpdate(updateBy, update, { new: true }, (counterErr, counterRes) => {
+        if (counterErr) {
+          console.log('counter findOneAndUpdate fail', counterErr);
+        } else {
+          if (!counterRes) {
+            const newCounter = new counter({
+              hitDates: new Date(),
+              urlCode: url.urlCode,
+              originalUrl: url.originalUrl,
+            });
 
-        newCounter.save()
-          .then((counterRes) => {
+            newCounter.save()
+              .then((counterRes) => {
+                res.status(200).json(url.originalUrl);
+              })
+              .catch((err) => { console.log('newCounter Save err :: ', err) });
+          } else {
             res.status(200).json(url.originalUrl);
-          })
-          .catch((err) => { console.log('newCounter Save err :: ', err) });
-      } else {
-        res.status(200).json(url.originalUrl);
-      }
-    }
-  });
-})
-  .catch((err) => {
-    res.status(400).json('URL not found');
-  })
+          }
+        }
+      });
+    })
+    .catch((err) => {
+      res.status(400).json('URL not found');
+    })
 });
 
 // Delete a short URL in the system by ID.      

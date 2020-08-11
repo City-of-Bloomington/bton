@@ -1,17 +1,5 @@
 <template>
   <div>
-    <div class="row crumbs">
-      <div class="container">
-        <!-- note active/comp need work -->
-        <example-breadcrumbs
-          active="uReport"
-          :navItems="[
-            { name: 'Settings'}
-          ]"
-        />
-      </div>
-    </div>
-
     <main>
       <div class="row title">
         <ul class="user-meta">
@@ -61,8 +49,6 @@
 </template>
 
 <script>
-import exampleBreadcrumbs from "~/components/design-system/exampleBreadcrumbs.vue";
-
 import { mapFields } from "vuex-map-fields";
 
 export default {
@@ -72,9 +58,6 @@ export default {
     });
   },
   middleware: "authenticated",
-  components: {
-    exampleBreadcrumbs,
-  },
   data() {
     return {
       userEmailDomain: "@bloomington.in.gov",
