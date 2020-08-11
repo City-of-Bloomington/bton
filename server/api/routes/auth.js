@@ -30,31 +30,22 @@ router.get('/verify', (req, res, next) => {
           user: response.data.serviceResponse.authenticationSuccess.user
         };
 
-        console.log('VERIFIED req.session.user', req.session.user);
-        console.log('VERIFIED req.session.user.user', req.session.user.user);
+        // console.log('VERIFIED req.session.user', req.session.user);
+        // console.log('VERIFIED req.session.user.user', req.session.user.user);
 
-        users.findOne({ username: req.session.user.user })
-          .then((currentUser) => {
-            if (currentUser) {
-              console.log('CurrentUser,', currentUser)
 
-              req.session.isLoggedIn = true;
+        let updateBy = { username: req.session.user.user },
+          update = {
+            "$set": {
+              lastLoginDate: new Date(),
+            }
+          };
 
-              let update = {
-                lastLoginDate: new Date(),
-              };
-
-              // users.findOneAndUpdate(currentUser.username, update, { new: true }, function (err, res) {
-              //   if (err) {
-              //     console.log('findOneAndUpdate e', err);
-              //   } else {
-              //     console.log('find and UPDATE,', res);
-              //   }
-              // });
-
-              req.session.user = currentUser;
-              req.session.save();
-            } else {
+        users.findOneAndUpdate(updateBy, update, { new: true }, (userErr, userRes) => {
+          if (userErr) {
+            console.log('user findOneAndUpdate fail', userErr);
+          } else {
+            if (!userRes) {
               const newUser = new users({
                 dateCreated: new Date(),
                 lastLoginDate: new Date(),
@@ -65,15 +56,18 @@ router.get('/verify', (req, res, next) => {
 
               newUser.save()
                 .then((userRes) => {
-                  console.log('newUser Save res :: ', userRes);
                   req.session.isLoggedIn = true;
                   req.session.user = userRes;
                   req.session.save();
                 })
                 .catch((err) => { console.log('newUser Save err :: ', err) });
+            } else {
+              req.session.isLoggedIn = true;
+              req.session.user = userRes;
+              req.session.save();
             }
-          })
-          .catch((err) => { console.log("Couldn't find a user") });
+          }
+        });
 
         res.redirect(process.env.CLIENT_HOST);
       } else {
