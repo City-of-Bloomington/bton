@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const { urls } = require('../models/url'),
+  { counter } = require('../models/counter'),
   { redirectHome,
     authRole } = require('../middleware'),
   { roles } = require('../roles'),
@@ -70,12 +71,39 @@ router.get('/short/:id', (req, res) => {
       hits: countBy
     }
   })
-    .then((url) => {
-      res.status(200).json(url.originalUrl);
-    })
-    .catch((err) => {
-      res.status(400).json('URL not found');
-    })
+    .then((url) =>
+      let updateBy = { urlCode: url.urlCode },
+      update = {
+        "$push": {
+          hitDates: new Date(),
+        }
+      };
+
+  counter.findOneAndUpdate(updateBy, update, { new: true }, (counterErr, counterRes) => {
+    if (counterErr) {
+      console.log('counter findOneAndUpdate fail', counterErr);
+    } else {
+      if (!counterRes) {
+        const newCounter = new counter({
+          hitDates: new Date(),
+          urlCode: url.urlCode,
+          originalUrl: url.originalUrl,
+        });
+
+        newCounter.save()
+          .then((counterRes) => {
+            res.status(200).json(url.originalUrl);
+          })
+          .catch((err) => { console.log('newCounter Save err :: ', err) });
+      } else {
+        res.status(200).json(url.originalUrl);
+      }
+    }
+  });
+})
+  .catch((err) => {
+    res.status(400).json('URL not found');
+  })
 });
 
 // Delete a short URL in the system by ID.      

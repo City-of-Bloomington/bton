@@ -1,26 +1,15 @@
 const mongoose = require('mongoose'),
-        Schema = mongoose.Schema;
-
-// const applicationsSchema = new Schema({
-//   dateCreated:  Date,
-//   name:         String,
-//   department:   String,
-//   role:         String,
-//   url:          String,
-//   shortBody:    String,
-//   body:         String,
-//   sections:     Object,
-// });
-
-// const applications = mongoose.model("applications", applicationsSchema);
-
-// export { applications };
+  Schema = mongoose.Schema;
 
 const countersSchema = new Schema({
-  _id: { type: String, required: true },
-  count: { type: Number, default: 0 }
+  urlCode: { type: String, required: true },
+  originalUrl: { type: String, required: true },
+  hitDates: {
+    type: Array,
+    required: true,
+  },
 });
 
-const Counter = mongoose.model('Counter', countersSchema);
+const counter = mongoose.model('counter', countersSchema);
 
-export { Counter };
+export { counter };
