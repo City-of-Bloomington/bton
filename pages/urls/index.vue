@@ -1,6 +1,6 @@
 <template>
   <main>
-    <div class="form-wrapper">
+    <div class="auto-suggest-wrapper">
       <form @submit.prevent @keyup.enter="searchEntered()">
         <label for="address-search" class="sr-only">Address Search</label>
         <exampleSearch
