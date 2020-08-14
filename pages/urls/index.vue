@@ -95,6 +95,37 @@
           <strong>Sorry,</strong> the system looks empty.
         </p>
       </fn1-tab>
+
+      <fn1-tab name="Whitelisted Urls" v-if="role == systemRoles.admin">
+        <form @submit.prevent>
+          <fn1-input
+            v-model="whitelistedURLValue"
+            label="URL"
+            placeholder="URL you wish to be accepted"
+            name="whitelist-url"
+            id="whitelist-url"
+          />
+          <input type="submit" value="Go" @click="postNewWhitelistUrl()" />
+        </form>
+
+        <table v-if="whitelistedUrls">
+          <thead>
+            <tr>
+              <th>Accepted Urls</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr v-for="u, i in whitelistedUrls" :key="u._id">
+              <td>{{ u.url }}</td>
+              <td>
+                <button @click="deleteWhitelistUrl(u._id)">delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </fn1-tab>
     </fn1-tabs>
   </main>
 </template>
@@ -109,12 +140,18 @@ import debounce from "lodash.debounce";
 export default {
   beforeRouteEnter(to, from, next) {
     next((vm) => {
+      vm.getNewWhitelistUrl();
+
       vm.$axios
-        .$get(`${process.env.apiHost}/api/urls`, {
-          withCredentials: true,
-        })
+        .$get(
+          `${process.env.apiHost}/api/urls?limit=${vm.limit}&skip=${vm.skip}`,
+          {
+            withCredentials: true,
+          }
+        )
         .then((res) => {
-          vm.urls = res;
+          vm.urls = res.urlRes;
+          vm.totalUrls = res.total;
         })
         .catch((err) => {
           console.log("Get URLs Fail -", err);
@@ -126,10 +163,15 @@ export default {
   middleware: "authenticated",
   data() {
     return {
+      totalUrls: null,
+      limit: 10000,
+      skip: 0,
       urls: null,
       addressSearchAuto: null,
       addressSearchAutoRes: null,
       searchHasFocus: false,
+      whitelistedURLValue: null,
+      whitelistedUrls: null,
     };
   },
   watch: {
@@ -171,9 +213,52 @@ export default {
           console.log("rm fail", err);
         });
     },
+    postNewWhitelistUrl() {
+      this.$axios
+        .$post(
+          `${process.env.apiHost}/api/url/whitelist`,
+          { url: this.whitelistedURLValue },
+          {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          console.log("postNewWhitelistUrl res", res);
+          this.getNewWhitelistUrl();
+        })
+        .catch((err) => {
+          console.log("postNewWhitelistUrl fail", err);
+        });
+    },
+    getNewWhitelistUrl() {
+      this.$axios
+        .$get(`${process.env.apiHost}/api/urls/whitelist`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          this.whitelistedUrls = res.urlRes;
+          console.log("getNewWhitelistUrl res", res.urlRes);
+        })
+        .catch((err) => {
+          console.log("getNewWhitelistUrl fail", err);
+        });
+    },
+    deleteWhitelistUrl(id) {
+      this.$axios
+        .$delete(`${process.env.apiHost}/api/urls/whitelist/delete/${id}`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          console.log("deleteWhitelistUrl res", res);
+          this.getNewWhitelistUrl();
+        })
+        .catch((err) => {
+          console.log("deleteWhitelistUrl fail", err);
+        });
+    },
   },
   computed: {
-    ...mapFields(["authenticated", "user"]),
+    ...mapFields(["systemRoles", "authenticated", "user", "user.user.role"]),
     usersUrls() {
       return this.urls.filter((url) => url.owner === this.user.user.username);
     },

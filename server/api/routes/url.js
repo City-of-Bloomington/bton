@@ -1,6 +1,7 @@
 require('dotenv').config();
 
-const { urls } = require('../models/url'),
+const { urls,
+  whitelistUrls } = require('../models/url'),
   { counter } = require('../models/counter'),
   { redirectHome,
     authRole } = require('../middleware'),
@@ -13,8 +14,13 @@ import { nanoid } from 'nanoid'
 // Get all URLs in the system.      
 router.get('/urls', authRole(roles.admin, roles.default), async (req, res) => {
   try {
-    let result = await urls.find().exec();
-    res.send(result);
+    const limit = parseInt(req.query.limit); // Make sure to parse the limit to number
+    const skip = parseInt(req.query.skip);// Make sure to parse the skip to number
+
+    let urlRes = await urls.find().skip(skip).limit(limit).exec();
+    let totalUrls = await urls.countDocuments();
+
+    res.status(200).json({ urlRes, "total": totalUrls });
   } catch (error) {
     res.status(500).send(error);
   }
@@ -111,6 +117,45 @@ router.get('/short/:id', (req, res) => {
 router.delete('/short/:id', authRole(roles.admin), (req, res) => {
   urls.find({ _id: req.params.id })
     .deleteOne()
+    .then((urlres) => { res.status(200).json({ message: 'Removed' }) })
+    .catch((err) => { res.status(200).json({ error: err }) })
+});
+
+router.post('/url/whitelist', authRole(roles.admin), (req, res) => {
+  if (validUrl.isUri(req.body.url)) {
+
+    const newWhitelistUrl = new whitelistUrls({
+      owner: req.session.user.username,
+      url: req.body.url,
+      createdDate: new Date(),
+    });
+
+    newWhitelistUrl.save()
+      .then((urlRes) => {
+        res.status(200).json(urlRes);
+      })
+      .catch((err) => {
+        res.status(400).json(err);
+      });
+
+  } else {
+    res.status(400).json('Invalid Base Url format');
+  }
+});
+
+router.get('/urls/whitelist', authRole(roles.admin, roles.default), async (req, res) => {
+  try {
+    let urlRes = await whitelistUrls.find().exec();
+    let totalUrls = await whitelistUrls.countDocuments();
+
+    res.status(200).json({ urlRes, "total": totalUrls });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+router.delete('/urls/whitelist/delete/:id', authRole(roles.admin), (req, res) => {
+  whitelistUrls.deleteOne({ _id: req.params.id })
     .then((urlres) => { res.status(200).json({ message: 'Removed' }) })
     .catch((err) => { res.status(200).json({ error: err }) })
 });

@@ -21,6 +21,13 @@ urlsSchema.pre('save', function (next) {
   });
 });
 
-const urls = mongoose.model('urls', urlsSchema);
+const whitelistUrlsSchema = new Schema({
+  url: { type: String, required: true },
+  owner: { type: String, required: true },
+  createdDate: { type: Date, default: Date.now },
+});
 
-export { urls };
+const urls = mongoose.model('urls', urlsSchema);
+const whitelistUrls = mongoose.model('whitelistUrls', whitelistUrlsSchema);
+
+export { urls, whitelistUrls };

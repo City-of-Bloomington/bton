@@ -9,6 +9,7 @@ import {
 export const strict = false;
 
 export const defaultState = () => ({
+  systemRoles: JSON.parse(process.env.USER_ROLES),
   authenticated: false,
   user: null,
   appData: null,
