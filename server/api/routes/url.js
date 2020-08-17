@@ -1,48 +1,52 @@
-require('dotenv').config();
+require("dotenv").config();
 
-const { urls,
-  whitelistUrls } = require('../models/url'),
-  { counter } = require('../models/counter'),
-  { redirectHome,
-    authRole } = require('../middleware'),
-  { roles } = require('../roles'),
-  router = require('express').Router(),
-  validUrl = require('valid-url');
+const { urls, whitelistUrls } = require("../models/url"),
+  { counter } = require("../models/counter"),
+  { redirectHome, authRole } = require("../middleware"),
+  { roles } = require("../roles"),
+  router = require("express").Router(),
+  validUrl = require("valid-url");
 
-import { nanoid } from 'nanoid'
+import { nanoid } from "nanoid";
 
-// Get all URLs in the system.      
-router.get('/urls', authRole(roles.admin, roles.default), async (req, res) => {
+// Get all URLs in the system.
+router.get("/urls", authRole(roles.admin, roles.default), async (req, res) => {
   try {
     const limit = parseInt(req.query.limit); // Make sure to parse the limit to number
-    const skip = parseInt(req.query.skip);// Make sure to parse the skip to number
+    const skip = parseInt(req.query.skip); // Make sure to parse the skip to number
 
-    let urlRes = await urls.find().skip(skip).limit(limit).exec();
+    let urlRes = await urls
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .exec();
     let totalUrls = await urls.countDocuments();
 
-    res.status(200).json({ urlRes, "total": totalUrls });
+    res.status(200).json({ urlRes, total: totalUrls });
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-router.get('/url/:id', (req, res) => {
-
-  urls.find({
-    "originalUrl": {
-      "$regex": req.params.id,
-      "$options": "i"
-    }
-  })
-    .then((url) => {
-      res.status(200).json(url)
+router.get("/url/:id", (req, res) => {
+  urls
+    .find({
+      originalUrl: {
+        $regex: req.params.id,
+        $options: "i"
+      }
     })
-    .catch((err) => { res.status(200).json('URL not found') })
+    .then(url => {
+      res.status(200).json(url);
+    })
+    .catch(err => {
+      res.status(200).json("URL not found");
+    });
 });
 
-router.post('/url', authRole(roles.admin, roles.default), (req, res) => {
+router.post("/url", authRole(roles.admin, roles.default), (req, res) => {
   if (validUrl.isUri(req.body.url)) {
-    console.log('Valid Base Url format');
+    console.log("Valid Base Url format");
 
     const urlCode = nanoid(5);
     let shortUrl = `${process.env.CLIENT_HOST}/${urlCode}`;
@@ -53,111 +57,139 @@ router.post('/url', authRole(roles.admin, roles.default), (req, res) => {
       urlCode: urlCode,
       shortUrl: shortUrl,
       createdDate: new Date(),
-      updatedDate: new Date(),
+      updatedDate: new Date()
     });
 
-    newURL.save()
-      .then((urlRes) => {
+    newURL
+      .save()
+      .then(urlRes => {
         res.status(200).json(urlRes);
       })
-      .catch((err) => {
+      .catch(err => {
         res.status(400).json(err);
       });
-
   } else {
-    res.status(400).json('Invalid Base Url format');
+    res.status(400).json("Invalid Base Url format");
   }
 });
 
-router.get('/short/:id', (req, res) => {
+router.get("/short/:id", (req, res) => {
   let countBy = 1;
 
-  urls.findOneAndUpdate({ urlCode: req.params.id }, {
-    $inc: {
-      hits: countBy
-    }
-  })
-    .then((url) => {
-
+  urls
+    .findOneAndUpdate(
+      { urlCode: req.params.id },
+      {
+        $inc: {
+          hits: countBy
+        }
+      }
+    )
+    .then(url => {
       let updateBy = { urlCode: url.urlCode },
         update = {
-          "$push": {
-            hitDates: new Date(),
+          $push: {
+            hitDates: new Date()
           }
         };
 
-      counter.findOneAndUpdate(updateBy, update, { new: true }, (counterErr, counterRes) => {
-        if (counterErr) {
-          console.log('counter findOneAndUpdate fail', counterErr);
-        } else {
-          if (!counterRes) {
-            const newCounter = new counter({
-              hitDates: new Date(),
-              urlCode: url.urlCode,
-              originalUrl: url.originalUrl,
-            });
-
-            newCounter.save()
-              .then((counterRes) => {
-                res.status(200).json(url.originalUrl);
-              })
-              .catch((err) => { console.log('newCounter Save err :: ', err) });
+      counter.findOneAndUpdate(
+        updateBy,
+        update,
+        { new: true },
+        (counterErr, counterRes) => {
+          if (counterErr) {
+            console.log("counter findOneAndUpdate fail", counterErr);
           } else {
-            res.status(200).json(url.originalUrl);
+            if (!counterRes) {
+              const newCounter = new counter({
+                hitDates: new Date(),
+                urlCode: url.urlCode,
+                originalUrl: url.originalUrl
+              });
+
+              newCounter
+                .save()
+                .then(counterRes => {
+                  res.status(200).json(url.originalUrl);
+                })
+                .catch(err => {
+                  console.log("newCounter Save err :: ", err);
+                });
+            } else {
+              res.status(200).json(url.originalUrl);
+            }
           }
         }
-      });
+      );
     })
-    .catch((err) => {
-      res.status(400).json('URL not found');
-    })
+    .catch(err => {
+      res.status(400).json("URL not found");
+    });
 });
 
-// Delete a short URL in the system by ID.      
-router.delete('/short/:id', authRole(roles.admin), (req, res) => {
-  urls.find({ _id: req.params.id })
+// Delete a short URL in the system by ID.
+router.delete("/short/:id", authRole(roles.admin), (req, res) => {
+  urls
+    .find({ _id: req.params.id })
     .deleteOne()
-    .then((urlres) => { res.status(200).json({ message: 'Removed' }) })
-    .catch((err) => { res.status(200).json({ error: err }) })
+    .then(urlres => {
+      res.status(200).json({ message: "Removed" });
+    })
+    .catch(err => {
+      res.status(200).json({ error: err });
+    });
 });
 
-router.post('/url/whitelist', authRole(roles.admin), (req, res) => {
-  if (validUrl.isUri(req.body.url)) {
-
+router.post("/url/whitelist", authRole(roles.admin), (req, res) => {
+  if (validUrl.isWebUri(req.body.url)) {
     const newWhitelistUrl = new whitelistUrls({
       owner: req.session.user.username,
       url: req.body.url,
-      createdDate: new Date(),
+      createdDate: new Date()
     });
 
-    newWhitelistUrl.save()
-      .then((urlRes) => {
+    newWhitelistUrl
+      .save()
+      .then(urlRes => {
         res.status(200).json(urlRes);
       })
-      .catch((err) => {
+      .catch(err => {
         res.status(400).json(err);
       });
-
   } else {
-    res.status(400).json('Invalid Base Url format');
+    res.status(400).json("Invalid Base Url format");
   }
 });
 
-router.get('/urls/whitelist', authRole(roles.admin, roles.default), async (req, res) => {
-  try {
-    let urlRes = await whitelistUrls.find().exec();
-    let totalUrls = await whitelistUrls.countDocuments();
+router.get(
+  "/urls/whitelist",
+  authRole(roles.admin, roles.default),
+  async (req, res) => {
+    try {
+      let urlRes = await whitelistUrls.find().exec();
+      let totalUrls = await whitelistUrls.countDocuments();
 
-    res.status(200).json({ urlRes, "total": totalUrls });
-  } catch (error) {
-    res.status(500).send(error);
+      res.status(200).json({ urlRes, total: totalUrls });
+    } catch (error) {
+      res.status(500).send(error);
+    }
   }
-});
+);
 
-router.delete('/urls/whitelist/delete/:id', authRole(roles.admin), (req, res) => {
-  whitelistUrls.deleteOne({ _id: req.params.id })
-    .then((urlres) => { res.status(200).json({ message: 'Removed' }) })
-    .catch((err) => { res.status(200).json({ error: err }) })
-});
+router.delete(
+  "/urls/whitelist/delete/:id",
+  authRole(roles.admin),
+  (req, res) => {
+    whitelistUrls
+      .deleteOne({ _id: req.params.id })
+      .then(urlres => {
+        res.status(200).json({ message: "Removed" });
+      })
+      .catch(err => {
+        res.status(200).json({ error: err });
+      });
+  }
+);
 
 module.exports = router;

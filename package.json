@@ -31,6 +31,7 @@
     "express": "^4.16.4",
     "express-session": "^1.17.1",
     "lodash.debounce": "^4.0.8",
+    "match-url-wildcard": "0.0.4",
     "mongoose": "^5.9.11",
     "nanoid": "^3.1.10",
     "nuxt": "^2.0.0",

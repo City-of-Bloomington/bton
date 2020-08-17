@@ -1,7 +1,9 @@
-import Vue from 'vue'
+import Vue from "vue";
 
 Vue.mixin({
-  data() { return {} },
+  data() {
+    return {};
+  },
   computed: {},
   methods: {
     /**
@@ -12,14 +14,17 @@ Vue.mixin({
      * @promise     stringToDashed
      * @param       { String } string
      * @return      { String}  The string formatted with dashes.
-     * 
+     *
      */
     stringToDashed(string) {
       return string
-        .replace(/\s+/g, '-')
-        .replace(/,/g, '')
-        .replace(/&/g, '-and-')
+        .replace(/\s+/g, "-")
+        .replace(/,/g, "")
+        .replace(/&/g, "-and-")
         .toLowerCase();
     },
+    stripTrailingSlash(str) {
+      return str.endsWith("/") ? str.slice(0, -1) : str;
+    }
   }
 });

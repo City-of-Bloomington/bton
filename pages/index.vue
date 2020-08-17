@@ -5,15 +5,22 @@
         <label for="tool-search">Shorten a URL</label>
         <p>
           <small>
-            <strong>Note:</strong> Only City of Bloomington URLs are allowed.
+            <strong>Note:</strong> Only Whitelisted Urls allowed.
           </small>
         </p>
 
         <fn1-alert
           v-if="createPostMessage.error || createPostMessage.success"
-          :variant="{'warning':createPostMessage.error, 'success':createPostMessage.success}"
+          :variant="{
+            warning: createPostMessage.error,
+            success: createPostMessage.success
+          }"
         >
-          <template v-if="createPostMessage.error">{{ createPostMessage.error }}</template>
+          <template v-if="createPostMessage.error">
+            {{
+            createPostMessage.error
+            }}
+          </template>
 
           <template v-if="createPostMessage.success">
             {{ createPostMessage.success.shortUrl }}
@@ -31,7 +38,7 @@
             placeholder="eg. https://bloomington.in.gov/ureport"
           />
 
-          <input type="submit" value="Shorten URL" />
+          <input type="submit" value="Shorten Url" />
         </div>
       </form>
     </section>
@@ -43,11 +50,31 @@ import { mapFields } from "vuex-map-fields";
 import clickToCopy from "~/components/design-system/clickToCopy.vue";
 
 export default {
-  mounted() {},
   components: { clickToCopy },
   middleware: "authenticated",
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      vm.$axios
+        .$get(`${process.env.apiHost}/api/urls/whitelist`, {
+          withCredentials: true,
+        })
+        .then((res) => {
+          let whitelistRes = [...res.urlRes],
+            result = whitelistRes
+              .filter((res) => res.url)
+              .map((ele) => ele.url);
+
+          vm.whitelist = result;
+        })
+        .catch((err) => {
+          console.log("Get URLs Fail -", err);
+        });
+    });
+  },
   data() {
     return {
+      whitelist: null,
+      passWhitelist: false,
       createPostMessage: {
         success: null,
         error: null,
@@ -57,26 +84,26 @@ export default {
   },
   watch: {},
   methods: {
-    // needs ported to back-end too
-    isBloomingtonURL(url) {
-      let res = url.match(
-        /(https?:\/\/(.+?\.)?bloomington\.in\.gov(\/[A-Za-z0-9\-\._~:\/\?#\[\]@!$&'\(\)\*\+,;\=]*)?)/g
-      );
-      return res !== null;
-    },
-    stripTrailingSlash(str) {
-      return str.endsWith("/") ? str.slice(0, -1) : str;
-    },
     submitURL() {
+      var matchUrl = require("match-url-wildcard");
+
       if (this.urlInput) {
         this.createPostMessage = {
           success: null,
           error: null,
         };
 
-        let url = this.stripTrailingSlash(this.urlInput);
+        for (let r of this.whitelist) {
+          if (matchUrl(this.urlInput, r)) {
+            console.log(matchUrl(this.urlInput, r));
+            this.passWhitelist = true;
+            break;
+          }
+        }
 
-        if (this.isBloomingtonURL(url)) {
+        if (this.passWhitelist) {
+          let url = this.stripTrailingSlash(this.urlInput);
+
           this.$axios
             .$post(
               `${process.env.apiHost}/api/url`,
@@ -93,8 +120,7 @@ export default {
               this.createPostMessage.error = err.response.data;
             });
         } else {
-          this.createPostMessage.error =
-            "Only City of Bloomington URLs allowed.";
+          this.createPostMessage.error = "URL not Whitelist accepted.";
         }
       } else {
         this.createPostMessage.error = "Enter a URL";
@@ -184,14 +210,10 @@ main {
       background: $color-fern;
       border: 1px solid darken($color-fern, 2%);
       color: white;
+      width: 100%;
       font-weight: 600;
       font-size: 18px;
       margin: 0;
-
-      &:hover,
-      &:focus {
-        background: darken($color-fern, 5%);
-      }
     }
   }
 }

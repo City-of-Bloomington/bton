@@ -20,9 +20,9 @@ export default {
     type: {
       type: String,
       default: "div",
-      validator: (value) => {
+      validator: value => {
         return value.match(/(div)/);
-      },
+      }
     },
     /**
      * ID Index of the css#ID to copy
@@ -30,15 +30,15 @@ export default {
      */
     id: {
       required: true,
-      type: String,
+      type: String
     },
     /**
      * short url, URL
      */
     value: {
       required: true,
-      type: String,
-    },
+      type: String
+    }
   },
   methods: {
     copyTestingCode(id, e) {
@@ -59,8 +59,8 @@ export default {
 
       codeToCopy.setAttribute("type", "hidden");
       window.getSelection().removeAllRanges();
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -74,6 +74,7 @@ export default {
     &:after {
       content: "";
       position: absolute;
+      top: 5px;
       right: 10px;
       width: 15px;
       height: 15px;

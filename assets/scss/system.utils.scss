@@ -45,8 +45,8 @@ $size-l: 24px;
 $size-m: 16px;
 $size-s: 14px;
 $size-xs: 12px;
-$font-heading: 'IBM Plex Sans', Helvetica, Arial, sans-serif;
-$font-text: 'IBM Plex Sans', Helvetica, Arial, sans-serif;
+$font-heading: "IBM Plex Sans", Helvetica, Arial, sans-serif;
+$font-text: "IBM Plex Sans", Helvetica, Arial, sans-serif;
 $weight-bold: 700;
 $weight-semi-bold: 600;
 $weight-normal: 400;
@@ -58,9 +58,13 @@ $duration-quickly: 0.08s;
 $duration-slowly: 0.5s;
 $z-index-modal: 9999;
 $z-index-sticky: 100;
-$media-query-m: (min-width: 768px);
-$media-query-l: (min-width: 1024px);
-$shadow-s: 0 0 0 1px rgba(92,106,196,.1);
+$media-query-m: (
+  min-width: 768px
+);
+$media-query-l: (
+  min-width: 1024px
+);
+$shadow-s: 0 0 0 1px rgba(92, 106, 196, 0.1);
 $spacing-xl: 2px;
 $spacing-l: 1px;
 $spacing-m: 0.5px;
@@ -79,9 +83,9 @@ $line-height-m: 1.6;
 $line-height-s: 1.3;
 $line-height-xs: 1;
 
-$border-default:   1px solid $color-grey-light;
-$text-color:       darken($color-grey, 55%);
-$color-fern:             #4caf50;
+$border-default: 1px solid $color-grey-light;
+$text-color: darken($color-grey, 55%);
+$color-fern: #4caf50;
 
 @mixin visuallyHidden() {
   border: 0;
@@ -97,7 +101,7 @@ $color-fern:             #4caf50;
 @mixin clearfix {
   &:after {
     clear: both;
-    content: '';
+    content: "";
     display: table;
   }
 }
@@ -125,7 +129,8 @@ $spacing-ratio: 1.7;
 //
 // @param  {Number} inset-squish-space to set
 @mixin inset-squish-space($value) {
-  padding: round($value / $spacing-ratio - 1px) $value round($value / $spacing-ratio);
+  padding: round($value / $spacing-ratio - 1px) $value
+    round($value / $spacing-ratio);
 }
 
 // Create stack-space
@@ -253,9 +258,12 @@ $spacing-ratio: 1.7;
 // @param  {Color} $color of background
 // @return {Boolean}
 @function color-difference($foreground, $background) {
-  $r: (max(red($foreground), red($background))) - (min(red($foreground), red($background)));
-  $g: (max(green($foreground), green($background))) - (min(green($foreground), green($background)));
-  $b: (max(blue($foreground), blue($background))) - (min(blue($foreground), blue($background)));
+  $r: (max(red($foreground), red($background))) -
+    (min(red($foreground), red($background)));
+  $g: (max(green($foreground), green($background))) -
+    (min(green($foreground), green($background)));
+  $b: (max(blue($foreground), blue($background))) -
+    (min(blue($foreground), blue($background)));
   $sum-rgb: $r + $g + $b;
 
   @if $sum-rgb < 350 {
@@ -343,7 +351,8 @@ $spacing-ratio: 1.7;
 
   @if $level == 1 {
     @each $key, $value in $map {
-      $output: $output + "#{$newline}- #{$key} #{available-names($value, $level + 1)}";
+      $output: $output +
+        "#{$newline}- #{$key} #{available-names($value, $level + 1)}";
     }
   } @else {
     $output: "(";
@@ -361,18 +370,31 @@ $spacing-ratio: 1.7;
   @return $output;
 }
 
-
-
-h1, h2, h3, h4, h5, h6, p, strong, i, ul, li {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+strong,
+i,
+ul,
+li {
   color: $text-color;
 }
 
-p, ol, ul, li, a {
+p,
+ol,
+ul,
+li,
+a {
   font-size: $size-m;
   line-height: 20px;
 }
 
-ul, ol {
+ul,
+ol {
   margin-bottom: 20px;
 }
 
@@ -386,7 +408,6 @@ button {
 
 a {
   position: relative;
-  
 
   &.external {
     display: inline-flex;
@@ -394,7 +415,7 @@ a {
 
     &:after {
       position: absolute;
-      content: '';
+      content: "";
       right: 8px;
       top: 50%;
       transform: translateY(-50%);
@@ -406,7 +427,6 @@ a {
 }
 
 .tabs-group {
-
   .tabs {
     // margin: 0 0 20px 0;
     margin: 0;
@@ -418,7 +438,7 @@ a {
         padding: 12px 16px 8px 16px;
         font-size: 18px;
         font-weight: $weight-semi-bold;
-        letter-spacing: .25px;
+        letter-spacing: 0.25px;
         color: lighten($text-color, 25%);
 
         &.active,
@@ -451,19 +471,19 @@ a {
       margin: 0 40px 0 0;
       padding: 0 40px 0 0;
       border-right: $border-default;
-      
+
       ul {
         flex-direction: column;
         width: max-content;
         border: none;
-        
+
         li {
           margin: 0 0 15px 0;
           padding: 0;
           text-align: left;
           font-size: 18px;
           font-weight: $weight-semi-bold;
-          letter-spacing: .25px;
+          letter-spacing: 0.25px;
           color: $text-color;
           border: none;
 
@@ -510,8 +530,32 @@ a {
 }
 
 table {
+  thead {
+    tr {
+      th {
+        &:first-child,
+        &:last-child {
+          padding: 0 0 8px 0;
+        }
+
+        &:last-child {
+          text-align: right;
+        }
+      }
+    }
+  }
+
   tbody {
     font-size: 14px;
+
+    tr {
+      td {
+        button {
+          display: block;
+          margin: 0 0 0 auto;
+        }
+      }
+    }
   }
 }
 
@@ -572,7 +616,6 @@ table {
         font-weight: 400 !important;
       }
 
-
       &::-ms-input-placeholder {
         color: lighten($text-color, 40%);
         font-weight: 400;
@@ -584,13 +627,14 @@ table {
       }
     }
 
-    ::v-deep button[type=submit] {
+    ::v-deep button[type="submit"] {
       display: none;
       background-color: $color-green;
       border-color: $color-green;
       margin: 0;
 
-      svg {}
+      svg {
+      }
 
       &:hover,
       &:focus {
@@ -609,7 +653,7 @@ table {
     max-height: 300px;
     width: 100%;
     background-color: white;
-    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.10);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
     -webkit-border-bottom-right-radius: $radius-default;
     -webkit-border-bottom-left-radius: $radius-default;
     -moz-border-radius-bottomright: $radius-default;
@@ -625,7 +669,7 @@ table {
       color: $text-color;
 
       &:focus {
-        border: 3px dashed $color-blue;;
+        border: 3px dashed $color-blue;
       }
 
       a {
@@ -666,4 +710,77 @@ table {
       }
     }
   }
+}
+
+form {
+  label {
+    color: $text-color;
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  input {
+    box-shadow: none;
+    border: 1px solid $color-grey;
+
+    &:hover,
+    &:focus {
+      box-shadow: none;
+      outline: none;
+      border: 1px solid darken($color-grey, 15%);
+    }
+
+    &[type="submit"] {
+      cursor: pointer;
+      background: $color-fern;
+      width: auto;
+      color: white;
+      font-weight: 600;
+      border: none;
+
+      &:hover,
+      &:focus {
+        background: darken($color-fern, 5%);
+      }
+    }
+  }
+}
+
+.field-group {
+  &.inline {
+    align-items: flex-end;
+    justify-content: space-between;
+    margin: 0 0 20px 0;
+
+    label {
+      width: 100%;
+
+      &:last-of-type {
+        margin: 0 0 8px 0;
+      }
+    }
+
+    input {
+      flex: 1;
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+
+      &[type="submit"] {
+        flex: 0;
+        height: 37px;
+        margin: 0 auto 0 0;
+        border-top-right-radius: $radius-default;
+        border-bottom-right-radius: $radius-default;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+}
+
+.badge {
+  border-radius: $radius-default;
+  background: $color-ucla-gold;
+  color: $text-color;
+  font-size: 14px;
 }

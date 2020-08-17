@@ -27,7 +27,7 @@
         </thead>
 
         <tbody>
-          <tr v-for="r, i in addressSearchAutoRes" :key="r._id">
+          <tr v-for="(r, i) in addressSearchAutoRes" :key="r._id">
             <!-- <td>{{ r.hits }}</td> -->
             <td>{{ r.originalUrl }}</td>
             <td>{{ r.shortUrl }}</td>
@@ -52,7 +52,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="u, i in usersUrls" :key="u._id">
+            <tr v-for="(u, i) in usersUrls" :key="u._id">
               <td>{{ u.hits }}</td>
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
@@ -80,7 +80,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="u, i in urls" :key="u._id">
+            <tr v-for="(u, i) in urls" :key="u._id">
               <!-- <td>{{ u.hits }}</td> -->
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
@@ -96,16 +96,51 @@
         </p>
       </fn1-tab>
 
-      <fn1-tab name="Whitelisted Urls" v-if="role == systemRoles.admin">
+      <fn1-tab name="Whitelisted Urls" class="whitelisted" v-if="role == systemRoles.admin">
+        <header>
+          <fn1-badge>Role: {{ systemRoles.admin }}</fn1-badge>
+          <p>
+            Whitelisted Urls are those allowed by the system to be accepted when
+            creating a new short Url.
+          </p>
+        </header>
+
+        <fn1-alert
+          v-if="
+            createWhiteListUrlMessage.error || createWhiteListUrlMessage.success
+          "
+          :variant="{
+            warning: createWhiteListUrlMessage.error,
+            success: createWhiteListUrlMessage.success
+          }"
+        >
+          <template v-if="createWhiteListUrlMessage.error">
+            {{
+            createWhiteListUrlMessage.error
+            }}
+          </template>
+
+          <template v-if="createWhiteListUrlMessage.success">
+            {{ createWhiteListUrlMessage.success.shortUrl }}
+            <clickToCopy :id="0" :value="createWhiteListUrlMessage.success.shortUrl" />
+          </template>
+        </fn1-alert>
+
         <form @submit.prevent>
-          <fn1-input
-            v-model="whitelistedURLValue"
-            label="URL"
-            placeholder="URL you wish to be accepted"
-            name="whitelist-url"
-            id="whitelist-url"
-          />
-          <input type="submit" value="Go" @click="postNewWhitelistUrl()" />
+          <div class="field-group inline">
+            <label for="whitelist-url">New Whitelist Url</label>
+
+            <input
+              type="text"
+              v-model="whitelistedURLValue"
+              label="New Whitelist Url"
+              placeholder="eg: https://bloomington.in.gov"
+              name="whitelist-url"
+              id="whitelist-url"
+            />
+
+            <input type="submit" value="Create" @click="postNewWhitelistUrl()" />
+          </div>
         </form>
 
         <table v-if="whitelistedUrls">
@@ -117,7 +152,7 @@
           </thead>
 
           <tbody>
-            <tr v-for="u, i in whitelistedUrls" :key="u._id">
+            <tr v-for="(u, i) in whitelistedUrls" :key="u._id">
               <td>{{ u.url }}</td>
               <td>
                 <button @click="deleteWhitelistUrl(u._id)">delete</button>
@@ -172,6 +207,10 @@ export default {
       searchHasFocus: false,
       whitelistedURLValue: null,
       whitelistedUrls: null,
+      createWhiteListUrlMessage: {
+        success: null,
+        error: null,
+      },
     };
   },
   watch: {
@@ -214,19 +253,23 @@ export default {
         });
     },
     postNewWhitelistUrl() {
+      let url = this.stripTrailingSlash(this.whitelistedURLValue);
+
       this.$axios
         .$post(
           `${process.env.apiHost}/api/url/whitelist`,
-          { url: this.whitelistedURLValue },
+          { url: url },
           {
             withCredentials: true,
           }
         )
         .then((res) => {
           console.log("postNewWhitelistUrl res", res);
+          this.createWhiteListUrlMessage.success = res.data;
           this.getNewWhitelistUrl();
         })
         .catch((err) => {
+          this.createWhiteListUrlMessage.error = err.response.data;
           console.log("postNewWhitelistUrl fail", err);
         });
     },
@@ -287,6 +330,32 @@ main {
 
   .tabs-group {
     margin: 20px 0 0 0;
+  }
+
+  .tab-pane {
+    header {
+      // background: red;
+      margin: 0 0 20px 0;
+      padding: 0 0 20px 0;
+      border-bottom: 1px solid $color-grey;
+
+      .badge {
+        margin: 0 0 20px 0;
+      }
+
+      p {
+        font-size: 16px;
+        color: lighten($text-color, 5%);
+        font-weight: 600;
+      }
+    }
+
+    &.whitelisted {
+      .field-group {
+        margin: 0 0 20px 0;
+        padding: 0 0 20px 0;
+      }
+    }
   }
 }
 </style>
