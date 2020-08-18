@@ -98,7 +98,7 @@
 
       <fn1-tab name="Whitelisted Urls" class="whitelisted" v-if="role == systemRoles.admin">
         <header>
-          <fn1-badge>Role: {{ systemRoles.admin }}</fn1-badge>
+          <fn1-badge>Role Required: {{ systemRoles.admin }}</fn1-badge>
           <p>
             Whitelisted Urls are those allowed by the system to be accepted when
             creating a new short Url.

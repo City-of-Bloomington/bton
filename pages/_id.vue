@@ -1,6 +1,14 @@
 <template>
   <main>
     <fn1-alert v-if="error">{{ error }}</fn1-alert>
+
+    <template v-if="redirectUrl">
+      <h4>redirecting ... {{ timeleft }} sec</h4>
+      <h3>
+        <a :href="redirectUrl" :title="redirectUrl" v-html="redirectUrl"></a>
+      </h3>
+      <!-- <embed :src="redirectUrl" width="600" height="400" /> -->
+    </template>
   </main>
 </template>
 
@@ -8,29 +16,32 @@
 import { mapFields } from "vuex-map-fields";
 
 export default {
+  layout: "redirect",
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       vm.$axios
         .$get(`${process.env.apiHost}/api/short/${to.params.id}`)
         .then((res) => {
-          window.location.href = res;
+          vm.redirectUrl = res;
+
+          setInterval(() => {
+            if (vm.timeleft <= 0) {
+              window.location.href = res;
+            } else {
+              vm.timeleft -= 1;
+            }
+          }, 500);
         })
         .catch((err) => {
           vm.error = err.response.data;
         });
     });
   },
-  mounted() {
-    // this.$axios.$get(`${process.env.apiHost}/api/applications`)
-    // .then((res)  => {
-    //   this.tools = res;
-    //   this.getLogos();
-    // })
-    // .catch((err) => { console.log('Get App Logo via ID Fail -', err) });
-  },
   components: {},
   data() {
     return {
+      timeleft: 5,
+      redirectUrl: null,
       error: null,
     };
   },
@@ -46,29 +57,29 @@ main {
   position: relative;
   width: 420px;
   margin: 0 auto;
-  padding: 100px 0 0 0;
+  padding: 0;
 
-  form {
-    input {
-      box-shadow: none;
-      margin: 0 0 20px 0;
-    }
+  h3,
+  h4,
+  a {
+    text-align: center;
+  }
 
-    label {
-      color: white;
-      font-weight: 600;
-      font-size: 28px;
-      margin: 0 0 20px 0;
-    }
+  h4 {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 20px;
+  }
 
-    input[type="submit"] {
-      background: $color-fern;
-      border: 1px solid darken($color-fern, 2%);
-      color: white;
-      font-weight: 600;
-      font-size: 18px;
-      margin: 0;
-    }
+  h3,
+  a {
+    color: white;
+    font-size: 24px;
+  }
+
+  embed {
+    pointer-events: none;
+    display: block;
+    width: 100%;
   }
 }
 </style>

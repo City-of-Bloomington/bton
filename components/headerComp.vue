@@ -6,36 +6,31 @@
         image:        `${headerLogo}`,
         imageAlt:     `${cityName}`
       }"
-      :application="{
-        name:         `${appName}`,
-        url:          `/`
-      }"
-      :navItems="[
-        
-        { name:       'URLs',
-          href:       `/urls`}
-      ]"
+      :application="showAppUrl"
+      :navItems="[showHeaderUrls]"
     >
-      <a
-        v-if="!authenticated"
-        slot="dropdown"
-        :href="`${api}/auth/login/`"
-        class="button auth"
-      >Login</a>
+      <template v-if="!redirect">
+        <a
+          v-if="!authenticated"
+          slot="dropdown"
+          :href="`${api}/auth/login/`"
+          class="button auth"
+        >Login</a>
 
-      <fn1-dropdown
-        v-if="authenticated"
-        slot="dropdown"
-        text="Menu"
-        navAlign="right"
-        :navItems="[
+        <fn1-dropdown
+          v-if="authenticated"
+          slot="dropdown"
+          text="Menu"
+          navAlign="right"
+          :navItems="[
           { name:       'Feedback',
           href:       `${cityWebsiteUrl}/ureport/miscellaneous/53`,
           target:     '_blank' },
           {name: 'Settings',  href: `${client}/settings/`},
           {name: 'Logout',    href: `${api}/auth/logout/`},
         ]"
-      />
+        />
+      </template>
     </example-header>
   </div>
 </template>
@@ -45,6 +40,12 @@ import exampleHeader from "~/components/design-system/exampleHeader.vue";
 import { mapFields } from "vuex-map-fields";
 
 export default {
+  props: {
+    redirect: {
+      type: Boolean,
+      default: false,
+    },
+  },
   components: { exampleHeader },
   data() {
     return {
@@ -60,6 +61,31 @@ export default {
   },
   computed: {
     ...mapFields(["authenticated"]),
+    showHeaderUrls() {
+      let urls;
+
+      if (!this.redirect) {
+        urls = { name: "URLs", href: `/urls` };
+      } else {
+        urls = {};
+      }
+      return urls;
+    },
+    showAppUrl() {
+      let url;
+
+      if (!this.redirect) {
+        url = {
+          name: `${this.appName}`,
+          url: `/`,
+        };
+      } else {
+        url = {
+          name: `${this.appName}`,
+        };
+      }
+      return url;
+    },
   },
 };
 </script>
