@@ -45,6 +45,7 @@
           <thead>
             <tr>
               <th>Hits</th>
+              <th>Delay</th>
               <th>Originals</th>
               <th>Shorts</th>
               <th>Actions</th>
@@ -54,18 +55,31 @@
           <tbody>
             <tr v-for="(u, i) in usersUrls" :key="u._id">
               <td>{{ u.hits }}</td>
+              <td>
+                <div>
+                  <input
+                    disabled="disabled"
+                    type="checkbox"
+                    id="delayPreview"
+                    name="delayPreview"
+                    v-model="u.delayPreview"
+                  />
+                  <label for="delayPreview" class="sr-only">Delay</label>
+                </div>
+              </td>
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td>
                 <clickToCopy :id="i" :value="u.shortUrl" />
+                <nuxt-link :to="{ name: 'urls-id', params: { id: u.urlCode } }"
+                  >Edit</nuxt-link
+                >
               </td>
             </tr>
           </tbody>
         </table>
 
-        <p v-else>
-          <strong>Sorry,</strong> you don't have any URLs yet.
-        </p>
+        <p v-else><strong>Sorry,</strong> you don't have any URLs yet.</p>
       </fn1-tab>
 
       <fn1-tab name="All Urls">
@@ -91,12 +105,14 @@
           </tbody>
         </table>
 
-        <p v-else>
-          <strong>Sorry,</strong> the system looks empty.
-        </p>
+        <p v-else><strong>Sorry,</strong> the system looks empty.</p>
       </fn1-tab>
 
-      <fn1-tab name="Whitelisted Urls" class="whitelisted" v-if="role == systemRoles.admin">
+      <fn1-tab
+        name="Whitelisted Urls"
+        class="whitelisted"
+        v-if="role == systemRoles.admin"
+      >
         <header>
           <fn1-badge>Role Required: {{ systemRoles.admin }}</fn1-badge>
           <p>
@@ -115,14 +131,15 @@
           }"
         >
           <template v-if="createWhiteListUrlMessage.error">
-            {{
-            createWhiteListUrlMessage.error
-            }}
+            {{ createWhiteListUrlMessage.error }}
           </template>
 
           <template v-if="createWhiteListUrlMessage.success">
             {{ createWhiteListUrlMessage.success.shortUrl }}
-            <clickToCopy :id="0" :value="createWhiteListUrlMessage.success.shortUrl" />
+            <clickToCopy
+              :id="0"
+              :value="createWhiteListUrlMessage.success.shortUrl"
+            />
           </template>
         </fn1-alert>
 
@@ -139,7 +156,11 @@
               id="whitelist-url"
             />
 
-            <input type="submit" value="Create" @click="postNewWhitelistUrl()" />
+            <input
+              type="submit"
+              value="Create"
+              @click="postNewWhitelistUrl()"
+            />
           </div>
         </form>
 
@@ -174,21 +195,21 @@ import debounce from "lodash.debounce";
 
 export default {
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
+    next(vm => {
       vm.getNewWhitelistUrl();
 
       vm.$axios
         .$get(
           `${process.env.apiHost}/api/urls?limit=${vm.limit}&skip=${vm.skip}`,
           {
-            withCredentials: true,
+            withCredentials: true
           }
         )
-        .then((res) => {
+        .then(res => {
           vm.urls = res.urlRes;
           vm.totalUrls = res.total;
         })
-        .catch((err) => {
+        .catch(err => {
           console.log("Get URLs Fail -", err);
         });
     });
@@ -209,27 +230,27 @@ export default {
       whitelistedUrls: null,
       createWhiteListUrlMessage: {
         success: null,
-        error: null,
-      },
+        error: null
+      }
     };
   },
   watch: {
-    addressSearchAuto: debounce(function (val, oldVal) {
+    addressSearchAuto: debounce(function(val, oldVal) {
       if (this.addressSearchAuto) {
         this.$axios
           .$get(`${process.env.apiHost}/api/url/${this.addressSearchAuto}`, {
-            withCredentials: true,
+            withCredentials: true
           })
-          .then((res) => {
+          .then(res => {
             this.addressSearchAutoRes = res;
           })
-          .catch((err) => {
+          .catch(err => {
             console.log("Get URL Fail -", err);
           });
       } else {
         this.autoSuggestRes = null;
       }
-    }, 500),
+    }, 500)
   },
   methods: {
     sFocus() {
@@ -243,12 +264,12 @@ export default {
     deleteURL(id) {
       this.$axios
         .$delete(`${process.env.apiHost}/api/short/${id}`, {
-          withCredentials: true,
+          withCredentials: true
         })
-        .then((res) => {
+        .then(res => {
           console.log("rm", res);
         })
-        .catch((err) => {
+        .catch(err => {
           console.log("rm fail", err);
         });
     },
@@ -260,15 +281,15 @@ export default {
           `${process.env.apiHost}/api/url/whitelist`,
           { url: url },
           {
-            withCredentials: true,
+            withCredentials: true
           }
         )
-        .then((res) => {
+        .then(res => {
           console.log("postNewWhitelistUrl res", res);
           this.createWhiteListUrlMessage.success = res.data;
           this.getNewWhitelistUrl();
         })
-        .catch((err) => {
+        .catch(err => {
           this.createWhiteListUrlMessage.error = err.response.data;
           console.log("postNewWhitelistUrl fail", err);
         });
@@ -276,36 +297,36 @@ export default {
     getNewWhitelistUrl() {
       this.$axios
         .$get(`${process.env.apiHost}/api/urls/whitelist`, {
-          withCredentials: true,
+          withCredentials: true
         })
-        .then((res) => {
+        .then(res => {
           this.whitelistedUrls = res.urlRes;
           console.log("getNewWhitelistUrl res", res.urlRes);
         })
-        .catch((err) => {
+        .catch(err => {
           console.log("getNewWhitelistUrl fail", err);
         });
     },
     deleteWhitelistUrl(id) {
       this.$axios
         .$delete(`${process.env.apiHost}/api/urls/whitelist/delete/${id}`, {
-          withCredentials: true,
+          withCredentials: true
         })
-        .then((res) => {
+        .then(res => {
           console.log("deleteWhitelistUrl res", res);
           this.getNewWhitelistUrl();
         })
-        .catch((err) => {
+        .catch(err => {
           console.log("deleteWhitelistUrl fail", err);
         });
-    },
+    }
   },
   computed: {
     ...mapFields(["systemRoles", "authenticated", "user", "user.user.role"]),
     usersUrls() {
-      return this.urls.filter((url) => url.owner === this.user.user.username);
-    },
-  },
+      return this.urls.filter(url => url.owner === this.user.user.username);
+    }
+  }
 };
 </script>
 

@@ -4,9 +4,7 @@
       <form @submit.prevent="submitURL()">
         <label for="tool-search">Shorten a URL</label>
         <p>
-          <small>
-            <strong>Note:</strong> Only Whitelisted Urls allowed.
-          </small>
+          <small> <strong>Note:</strong> Only Whitelisted Urls allowed. </small>
         </p>
 
         <fn1-alert
@@ -17,9 +15,7 @@
           }"
         >
           <template v-if="createPostMessage.error">
-            {{
-            createPostMessage.error
-            }}
+            {{ createPostMessage.error }}
           </template>
 
           <template v-if="createPostMessage.success">
@@ -27,6 +23,18 @@
             <clickToCopy :id="0" :value="createPostMessage.success.shortUrl" />
           </template>
         </fn1-alert>
+
+        <div class="field-group checkbox">
+          <input
+            type="checkbox"
+            v-model="urlDelay"
+            id="delay-preview"
+            name="delay-preview"
+          />
+          <label for="delay-preview">
+            Enable redirect delay (5s) &amp; go-to Url preview?
+          </label>
+        </div>
 
         <div class="field-group">
           <input
@@ -53,20 +61,18 @@ export default {
   components: { clickToCopy },
   middleware: "authenticated",
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
+    next(vm => {
       vm.$axios
         .$get(`${process.env.apiHost}/api/urls/whitelist`, {
-          withCredentials: true,
+          withCredentials: true
         })
-        .then((res) => {
+        .then(res => {
           let whitelistRes = [...res.urlRes],
-            result = whitelistRes
-              .filter((res) => res.url)
-              .map((ele) => ele.url);
+            result = whitelistRes.filter(res => res.url).map(ele => ele.url);
 
           vm.whitelist = result;
         })
-        .catch((err) => {
+        .catch(err => {
           console.log("Get URLs Fail -", err);
         });
     });
@@ -77,9 +83,10 @@ export default {
       passWhitelist: false,
       createPostMessage: {
         success: null,
-        error: null,
+        error: null
       },
       urlInput: null,
+      urlDelay: false
     };
   },
   watch: {},
@@ -90,7 +97,7 @@ export default {
       if (this.urlInput) {
         this.createPostMessage = {
           success: null,
-          error: null,
+          error: null
         };
 
         for (let r of this.whitelist) {
@@ -107,16 +114,17 @@ export default {
           this.$axios
             .$post(
               `${process.env.apiHost}/api/url`,
-              { url: url },
+              { url: url, delayPreview: this.urlDelay },
               {
-                withCredentials: true,
+                withCredentials: true
               }
             )
-            .then((res) => {
+            .then(res => {
               this.createPostMessage.success = res;
               this.urlInput = null;
+              this.urlDelay = false;
             })
-            .catch((err) => {
+            .catch(err => {
               this.createPostMessage.error = err.response.data;
             });
         } else {
@@ -125,7 +133,7 @@ export default {
       } else {
         this.createPostMessage.error = "Enter a URL";
       }
-    },
+    }
   },
   computed: {
     ...mapFields(["authenticated", "user"]),
@@ -135,8 +143,8 @@ export default {
           if (this.user.user.role == "admin") return true;
 
       return false;
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -165,6 +173,25 @@ main {
     }
   }
 
+  .field-group {
+    &.checkbox {
+      align-items: center;
+
+      input {
+        margin: 0 10px 0 0;
+      }
+
+      label {
+        border-bottom: none;
+        color: lighten($text-color, 15%);
+        font-weight: 600;
+        font-size: 14px;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+
   form {
     input {
       box-shadow: none;
@@ -177,6 +204,11 @@ main {
         box-shadow: none;
         outline: none;
         border: 1px solid darken($color-grey, 15%);
+      }
+
+      &[type="checkbox"] {
+        appearance: auto;
+        width: auto;
       }
     }
 

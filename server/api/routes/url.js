@@ -31,7 +31,7 @@ router.get("/urls", authRole(roles.admin, roles.default), async (req, res) => {
 router.get("/url/:id", (req, res) => {
   urls
     .find({
-      originalUrl: {
+      urlCode: {
         $regex: req.params.id,
         $options: "i"
       }
@@ -56,6 +56,7 @@ router.post("/url", authRole(roles.admin, roles.default), (req, res) => {
       originalUrl: req.body.url,
       urlCode: urlCode,
       shortUrl: shortUrl,
+      delayPreview: req.body.delayPreview,
       createdDate: new Date(),
       updatedDate: new Date()
     });
@@ -72,6 +73,59 @@ router.post("/url", authRole(roles.admin, roles.default), (req, res) => {
     res.status(400).json("Invalid Base Url format");
   }
 });
+
+// Edit URL in the system by ID.
+router.post(
+  "/url/:id/edit",
+  authRole(roles.admin, roles.default),
+  (req, res, next) => {
+    let findById = { _id: req.body.id },
+      update = {
+        $set: {
+          delayPreview: req.body.delayPreview,
+          originalUrl: req.body.originalUrl,
+          updatedDate: new Date()
+        }
+      };
+
+    urls.findOne(findById, (err, result) => {
+      if (err) {
+        res.status(404).json({ saved: false, error: err });
+      } else {
+        if (req.session.user.role == roles.admin) {
+          urls.updateOne(findById, update, { new: true }, (err, updateRes) => {
+            if (err) {
+              res
+                .status(200)
+                .json({ saved: false, update: "doh. we had an error." });
+            } else {
+              res.status(200).json({ saved: true, update: updateRes });
+            }
+          });
+        } else if (req.session.user.role == roles.default) {
+          if (req.session.user.username == result.owner) {
+            urls.updateOne(
+              findById,
+              update,
+              { new: true },
+              (err, updateRes) => {
+                if (err) {
+                  res
+                    .status(200)
+                    .json({ saved: false, update: "doh. we had an error." });
+                } else {
+                  res.status(200).json({ saved: true, update: updateRes });
+                }
+              }
+            );
+          } else {
+            res.status(200).json({ saved: false, update: "not the owner" });
+          }
+        }
+      }
+    });
+  }
+);
 
 router.get("/short/:id", (req, res) => {
   let countBy = 1;
@@ -111,13 +165,18 @@ router.get("/short/:id", (req, res) => {
               newCounter
                 .save()
                 .then(counterRes => {
-                  res.status(200).json(url.originalUrl);
+                  res.status(200).json({
+                    url: url.originalUrl,
+                    delayPreview: url.delayPreview
+                  });
                 })
                 .catch(err => {
                   console.log("newCounter Save err :: ", err);
                 });
             } else {
-              res.status(200).json(url.originalUrl);
+              res
+                .status(200)
+                .json({ url: url.originalUrl, delayPreview: url.delayPreview });
             }
           }
         }

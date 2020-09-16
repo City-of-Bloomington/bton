@@ -2,7 +2,7 @@
   <main>
     <fn1-alert v-if="error">{{ error }}</fn1-alert>
 
-    <template v-if="redirectUrl">
+    <template v-if="redirectUrl && delayPreview">
       <h4>redirecting ... {{ timeleft }} sec</h4>
       <h3>
         <a :href="redirectUrl" :title="redirectUrl" v-html="redirectUrl"></a>
@@ -18,21 +18,25 @@ import { mapFields } from "vuex-map-fields";
 export default {
   layout: "redirect",
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
+    next(vm => {
       vm.$axios
         .$get(`${process.env.apiHost}/api/short/${to.params.id}`)
-        .then((res) => {
-          vm.redirectUrl = res;
+        .then(res => {
+          vm.redirectUrl = res.url;
 
-          setInterval(() => {
-            if (vm.timeleft <= 0) {
-              window.location.href = res;
-            } else {
-              vm.timeleft -= 1;
-            }
-          }, 500);
+          if (res.delayPreview) {
+            setInterval(() => {
+              if (vm.timeleft <= 0) {
+                window.location.href = res.url;
+              } else {
+                vm.timeleft -= 1;
+              }
+            }, 500);
+          } else {
+            window.location.href = res.url;
+          }
         })
-        .catch((err) => {
+        .catch(err => {
           vm.error = err.response.data;
         });
     });
@@ -42,12 +46,13 @@ export default {
     return {
       timeleft: 5,
       redirectUrl: null,
-      error: null,
+      delayPreview: false,
+      error: null
     };
   },
   watch: {},
   methods: {},
-  computed: {},
+  computed: {}
 };
 </script>
 

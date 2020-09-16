@@ -730,6 +730,11 @@ form {
       border: 1px solid darken($color-grey, 15%);
     }
 
+    &[type="checkbox"] {
+      appearance: auto;
+      width: auto;
+    }
+
     &[type="submit"] {
       cursor: pointer;
       background: $color-fern;
@@ -774,6 +779,14 @@ form {
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
       }
+    }
+  }
+
+  &.checkbox {
+    align-items: center;
+
+    label {
+      margin: 0 5px 0 0;
     }
   }
 }

@@ -30,7 +30,7 @@ export default {
      */
     id: {
       required: true,
-      type: String
+      type: Number
     },
     /**
      * short url, URL
