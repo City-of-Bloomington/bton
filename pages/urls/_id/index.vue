@@ -130,7 +130,12 @@ export default {
   watch: {
     originalUrl: debounce(function(val, oldVal) {
       if (val != oldVal && oldVal != undefined) {
-        console.log("originalUrl Changed!", val, oldVal);
+        // console.log("originalUrl Changed!", val, oldVal);
+
+        this.editUrlMessage = {
+          success: null,
+          error: null
+        };
 
         let data = {
           id: this.url._id,
@@ -144,10 +149,42 @@ export default {
           })
           .then(res => {
             this.editUrlMessage.success = res;
+            this.editSuccessMessage;
           })
           .catch(err => {
             this.editUrlMessage.error = err;
-            console.log("Edit URL Fail -", err);
+            this.editFailMessage;
+            // console.log("Edit URL Fail -", err);
+          });
+      }
+    }, 500),
+    delayPreview: debounce(function(val, oldVal) {
+      if (val != oldVal && oldVal != undefined) {
+        // console.log("delayPreview Changed!", val, oldVal);
+
+        this.editUrlMessage = {
+          success: null,
+          error: null
+        };
+
+        let data = {
+          id: this.url._id,
+          delayPreview: this.url.delayPreview,
+          originalUrl: this.url.originalUrl
+        };
+
+        this.$axios
+          .$post(`${process.env.apiHost}/api/url/${this.url._id}/edit`, data, {
+            withCredentials: true
+          })
+          .then(res => {
+            this.editUrlMessage.success = res;
+            this.editSuccessMessage;
+          })
+          .catch(err => {
+            this.editUrlMessage.error = err;
+            this.editFailMessage;
+            // console.log("Edit URL Fail -", err);
           });
       }
     }, 500)
@@ -160,6 +197,24 @@ export default {
     },
     delayPreview() {
       if (this.url) return this.url.delayPreview;
+    },
+    editSuccessMessage() {
+      if (this.editUrlMessage) {
+        if (this.editUrlMessage.success != null) {
+          setTimeout(() => {
+            this.editUrlMessage.success = null;
+          }, 5000);
+        }
+      }
+    },
+    editFailMessage() {
+      if (this.editUrlMessage) {
+        if (this.editUrlMessage.error != null) {
+          setTimeout(() => {
+            this.editUrlMessage.error = null;
+          }, 5000);
+        }
+      }
     }
   }
 };
