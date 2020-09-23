@@ -69,9 +69,11 @@
               </td>
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
-              <td>
+              <td class="button-row">
                 <clickToCopy :id="i" :value="u.shortUrl" />
-                <nuxt-link :to="{ name: 'urls-id', params: { id: u.urlCode } }"
+                <nuxt-link
+                  class="button"
+                  :to="{ name: 'urls-id', params: { id: u.urlCode } }"
                   >Edit</nuxt-link
                 >
               </td>
@@ -98,8 +100,14 @@
               <!-- <td>{{ u.hits }}</td> -->
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
-              <td>
+              <td class="button-row">
                 <clickToCopy :id="i" :value="u.shortUrl" />
+                <nuxt-link
+                  v-if="role == systemRoles.admin"
+                  class="button"
+                  :to="{ name: 'urls-id', params: { id: u.urlCode } }"
+                  >Edit</nuxt-link
+                >
               </td>
             </tr>
           </tbody>
@@ -343,6 +351,21 @@ main {
 
   table {
     color: $text-color;
+
+    td {
+      &.button-row {
+        display: flex;
+        padding: 8px 0 8px 8px;
+
+        .button {
+          margin: 0;
+
+          &:nth-child(1n) {
+            margin: 0 0 0 5px;
+          }
+        }
+      }
+    }
   }
 
   .search-results {
