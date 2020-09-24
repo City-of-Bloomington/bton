@@ -8,7 +8,9 @@ module.exports = {
     apiHost: process.env.API_HOST,
     clientHost: process.env.CLIENT_HOST,
     cobWebsiteURL: process.env.CITY_WEBSITE_URL,
-    userRoles: process.env.USER_ROLES
+    userRoles: process.env.USER_ROLES,
+    appName: process.env.APP_NAME,
+    cityName: process.env.CITY_NAME
   },
 
   head: {

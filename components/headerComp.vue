@@ -2,9 +2,9 @@
   <div>
     <example-header
       :logo="{
-        url:          `${cityWebsiteUrl}`,
-        image:        `${headerLogo}`,
-        imageAlt:     `${cityName}`
+        url: `${cobSiteUrl}`,
+        image: `${headerLogo}`,
+        imageAlt: `${nameOfCity}`
       }"
       :application="showAppUrl"
       :navItems="[showHeaderUrls]"
@@ -15,7 +15,8 @@
           slot="dropdown"
           :href="`${api}/auth/login/`"
           class="button auth"
-        >Login</a>
+          >Login</a
+        >
 
         <fn1-dropdown
           v-if="authenticated"
@@ -23,12 +24,14 @@
           text="Menu"
           navAlign="right"
           :navItems="[
-          { name:       'Feedback',
-          href:       `${cityWebsiteUrl}/ureport/miscellaneous/53`,
-          target:     '_blank' },
-          {name: 'Settings',  href: `${client}/settings/`},
-          {name: 'Logout',    href: `${api}/auth/logout/`},
-        ]"
+            {
+              name: `Feedback`,
+              href: `${cobSiteUrl}/ureport/miscellaneous/53`,
+              target: '_blank'
+            },
+            { name: 'Settings', href: `${client}/settings/` },
+            { name: 'Logout', href: `${api}/auth/logout/` }
+          ]"
         />
       </template>
     </example-header>
@@ -43,20 +46,13 @@ export default {
   props: {
     redirect: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   components: { exampleHeader },
   data() {
     return {
-      appName: process.env.APP_NAME,
-      client: process.env.clientHost,
-      api: process.env.apiHost,
-      cityWebsiteUrl: process.env.CITY_WEBSITE_URL,
-      cityName: process.env.CITY_NAME,
-      headerLogo: require("../assets/images/cob-logo-horizontal.svg"),
-      logoHeading: process.env.LOGO_HEADING,
-      logoSubHeading: process.env.LOGO_SUB_HEADING,
+      headerLogo: require("../assets/images/cob-logo-horizontal.svg")
     };
   },
   computed: {
@@ -76,17 +72,29 @@ export default {
 
       if (!this.redirect) {
         url = {
-          name: `${this.appName}`,
-          url: `/`,
+          name: `${process.env.appName}`,
+          url: `/`
         };
       } else {
         url = {
-          name: `${this.appName}`,
+          name: `${process.env.appName}`
         };
       }
       return url;
     },
-  },
+    cobSiteUrl() {
+      return process.env.cobWebsiteURL;
+    },
+    nameOfCity() {
+      return process.env.cityName;
+    },
+    api() {
+      return process.env.apiHost;
+    },
+    client() {
+      return process.env.clientHost;
+    }
+  }
 };
 </script>
 
