@@ -14,8 +14,18 @@
             success: createPostMessage.success
           }"
         >
-          <template v-if="createPostMessage.error">
-            {{ createPostMessage.error }}
+          <template v-if="createPostMessage.error.message">
+            <p>{{ createPostMessage.error.message }}</p>
+            <hr />
+          </template>
+
+          <template v-if="createPostMessage.error.url.length">
+            {{ createPostMessage.error.url[0].shortUrl }}
+
+            <clickToCopy
+              :id="0"
+              :value="createPostMessage.error.url[0].shortUrl"
+            />
           </template>
 
           <template v-if="createPostMessage.success">

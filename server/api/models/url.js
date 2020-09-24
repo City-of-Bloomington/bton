@@ -19,7 +19,7 @@ urlsSchema.pre("save", function(next) {
       next();
     } else {
       console.log("url exists: ", self.originalUrl);
-      next("URL already exists.");
+      next({ message: "URL already exists.", url: docs });
     }
   });
 });

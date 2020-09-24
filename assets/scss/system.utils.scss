@@ -521,11 +521,24 @@ a {
 }
 
 .alert {
+  flex-wrap: wrap;
   padding: 10px 20px;
   font-weight: 600;
 
   &.success {
     letter-spacing: 0.25px;
+  }
+
+  &.warning {
+    p {
+      color: #6b4d00;
+      font-weight: inherit;
+    }
+  }
+
+  p {
+    margin: 0 0 10px 0;
+    padding: 0;
   }
 }
 
