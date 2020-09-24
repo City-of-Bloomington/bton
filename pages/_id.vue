@@ -25,6 +25,8 @@ export default {
           vm.redirectUrl = res.url;
 
           if (res.delayPreview) {
+            vm.delayPreview = true;
+
             setInterval(() => {
               if (vm.timeleft <= 0) {
                 window.location.href = res.url;
