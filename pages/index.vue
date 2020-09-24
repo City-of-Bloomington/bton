@@ -14,18 +14,19 @@
             success: createPostMessage.success
           }"
         >
-          <template v-if="createPostMessage.error.message">
+          <template v-if="createPostMessage.error">
             <p>{{ createPostMessage.error.message }}</p>
-            <hr />
-          </template>
 
-          <template v-if="createPostMessage.error.url.length">
-            {{ createPostMessage.error.url[0].shortUrl }}
+            <template v-if="createPostMessage.error.url">
+              <hr />
 
-            <clickToCopy
-              :id="0"
-              :value="createPostMessage.error.url[0].shortUrl"
-            />
+              {{ createPostMessage.error.url[0].shortUrl }}
+
+              <clickToCopy
+                :id="0"
+                :value="createPostMessage.error.url[0].shortUrl"
+              />
+            </template>
           </template>
 
           <template v-if="createPostMessage.success">
@@ -138,10 +139,13 @@ export default {
               this.createPostMessage.error = err.response.data;
             });
         } else {
-          this.createPostMessage.error = "URL not Whitelist accepted.";
+          this.createPostMessage.error = {
+            message: "Url not Whitelist accepted.",
+            url: null
+          };
         }
       } else {
-        this.createPostMessage.error = "Enter a URL";
+        this.createPostMessage.error = { message: "Enter a Url.", url: null };
       }
     }
   },
