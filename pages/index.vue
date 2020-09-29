@@ -4,7 +4,9 @@
       <form @submit.prevent="submitURL()">
         <label for="tool-search">Shorten a URL</label>
         <p>
-          <small> <strong>Note:</strong> Only Whitelisted Urls allowed. </small>
+          <small>
+            <strong>Note:</strong> Only {{ passlistTerm }} Urls allowed.
+          </small>
         </p>
 
         <fn1-alert
@@ -140,7 +142,7 @@ export default {
             });
         } else {
           this.createPostMessage.error = {
-            message: "Url not Whitelist accepted.",
+            message: `Url not ${this.passlistTerm} accepted.`,
             url: null
           };
         }
@@ -157,6 +159,9 @@ export default {
           if (this.user.user.role == "admin") return true;
 
       return false;
+    },
+    passlistTerm() {
+      return process.env.passListTerm;
     }
   }
 };

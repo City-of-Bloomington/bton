@@ -31,7 +31,7 @@
             <!-- <td>{{ r.hits }}</td> -->
             <td>{{ r.originalUrl }}</td>
             <td>{{ r.shortUrl }}</td>
-            <td>
+            <td class="button-row">
               <clickToCopy :id="i" :value="r.shortUrl" />
             </td>
           </tr>
@@ -41,7 +41,7 @@
 
     <fn1-tabs v-if="urls && !searchHasFocus">
       <fn1-tab name="Your Urls" :selected="true">
-        <table v-if="usersUrls.length">
+        <table v-if="usersUrls.length" class="users-urls">
           <thead>
             <tr>
               <th>Hits</th>
@@ -85,7 +85,7 @@
       </fn1-tab>
 
       <fn1-tab name="All Urls">
-        <table v-if="urls.length">
+        <table v-if="urls.length" class="all-urls">
           <thead>
             <tr>
               <!-- <th>Hits</th> -->
@@ -117,15 +117,15 @@
       </fn1-tab>
 
       <fn1-tab
-        name="Whitelisted Urls"
+        :name="`${passlistTerm} Urls`"
         class="whitelisted"
         v-if="role == systemRoles.admin"
       >
         <header>
           <fn1-badge>Role Required: {{ systemRoles.admin }}</fn1-badge>
           <p>
-            Whitelisted Urls are those allowed by the system to be accepted when
-            creating a new short Url.
+            {{ passlistTerm }} Urls are those allowed by the system to be
+            accepted when creating a new short Url.
           </p>
         </header>
 
@@ -153,7 +153,7 @@
 
         <form @submit.prevent>
           <div class="field-group inline">
-            <label for="whitelist-url">New Whitelist Url</label>
+            <label for="whitelist-url">{{ passlistTerm }} Url</label>
 
             <input
               type="text"
@@ -172,7 +172,7 @@
           </div>
         </form>
 
-        <table v-if="whitelistedUrls">
+        <table v-if="whitelistedUrls" class="passlist-urls">
           <thead>
             <tr>
               <th>Accepted Urls</th>
@@ -333,6 +333,9 @@ export default {
     ...mapFields(["systemRoles", "authenticated", "user", "user.user.role"]),
     usersUrls() {
       return this.urls.filter(url => url.owner === this.user.user.username);
+    },
+    passlistTerm() {
+      return process.env.passListTerm;
     }
   }
 };
@@ -352,10 +355,34 @@ main {
   table {
     color: $text-color;
 
+    &.users-urls {
+      table-layout: fixed;
+
+      th,
+      td {
+        &:first-child {
+          width: 50px;
+        }
+
+        &:nth-child(2) {
+          width: 55px;
+        }
+
+        &:nth-child(3),
+        &:nth-child(4) {
+          max-width: 275px;
+        }
+      }
+    }
+
     td {
+      word-wrap: break-word;
+
       &.button-row {
+        width: 100%;
         display: flex;
         padding: 8px 0 8px 8px;
+        justify-content: flex-end;
 
         .button {
           margin: 0;

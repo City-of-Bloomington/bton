@@ -31,7 +31,7 @@ router.get("/urls", authRole(roles.admin, roles.default), async (req, res) => {
 router.get("/url/:id", (req, res) => {
   urls
     .find({
-      urlCode: {
+      originalUrl: {
         $regex: req.params.id,
         $options: "i"
       }
@@ -43,6 +43,22 @@ router.get("/url/:id", (req, res) => {
       res.status(200).json("URL not found");
     });
 });
+
+// router.get("/url/:id", (req, res) => {
+//   urls
+//     .find({
+//       urlCode: {
+//         $regex: req.params.id,
+//         $options: "i"
+//       }
+//     })
+//     .then(url => {
+//       res.status(200).json(url);
+//     })
+//     .catch(err => {
+//       res.status(200).json("URL not found");
+//     });
+// });
 
 router.post("/url", authRole(roles.admin, roles.default), (req, res) => {
   if (validUrl.isUri(req.body.url)) {

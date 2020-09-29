@@ -1,8 +1,5 @@
 module.exports = {
   mode: "universal",
-  // server: {
-  //   port: 443
-  // },
 
   env: {
     apiHost: process.env.API_HOST,
@@ -10,7 +7,8 @@ module.exports = {
     cobWebsiteURL: process.env.CITY_WEBSITE_URL,
     userRoles: process.env.USER_ROLES,
     appName: process.env.APP_NAME,
-    cityName: process.env.CITY_NAME
+    cityName: process.env.CITY_NAME,
+    passListTerm: process.env.PASSLIST_TERM || "Passlist"
   },
 
   head: {
@@ -39,10 +37,8 @@ module.exports = {
   loading: { color: "#fff" },
 
   modules: [
-    // Doc: https://axios.nuxtjs.org/usage
     "@nuxtjs/axios",
     "@nuxtjs/pwa",
-    // Doc: https://github.com/nuxt-community/dotenv-module
     "@nuxtjs/dotenv",
     "@nuxtjs/style-resources",
     "cookie-universal-nuxt"
@@ -57,11 +53,7 @@ module.exports = {
   plugins: [
     { src: "~/plugins/design-system" },
     { src: "~/plugins/universal-methods" },
-    // { src: '~/plugins/click-outside' },
     { src: "~/plugins/google-analytics.js", ssr: false }
-    // { src: '~/plugins/persistedState.js',   ssr: false },
-    // { src: '~/plugins/vue-cropper',         ssr: false },
-    // { src: '~/plugins/vuedraggable.js',     ssr: false }
   ],
 
   /*

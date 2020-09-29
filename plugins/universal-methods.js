@@ -4,7 +4,6 @@ Vue.mixin({
   data() {
     return {};
   },
-  computed: {},
   methods: {
     /**
      * Given a string, you'll get it back formatted

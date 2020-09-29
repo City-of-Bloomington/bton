@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
@@ -17,13 +19,17 @@ urlsSchema.pre("save", function(next) {
 
   urls.find({ originalUrl: self.originalUrl }, function(err, docs) {
     if (!docs.length) {
-      whitelistUrls.find({ url: self.originalUrl }, function(err, url) {
-        if (!url.length) {
-          next({ message: "Url not Whitelisted.", url: null });
-        } else {
-          next();
-        }
-      });
+      // whitelistUrls.find({ url: self.originalUrl }, function(err, url) {
+      //   if (!url.length) {
+      //     next({
+      //       message: `Url not ${process.env.PASSLIST_TERM} accepted.`,
+      //       url: null
+      //     });
+      //   } else {
+      //     next();
+      //   }
+      // });
+      next();
     } else {
       next({ message: "Url already exists.", url: docs });
     }
