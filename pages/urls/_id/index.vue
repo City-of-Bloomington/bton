@@ -104,7 +104,7 @@ export default {
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.$axios
-        .$get(`${process.env.apiHost}/api/url/${to.params.id}`, {
+        .$get(`${process.env.apiHost}/api/url/short/${to.params.id}`, {
           withCredentials: true
         })
         .then(res => {
