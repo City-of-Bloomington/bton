@@ -71,11 +71,42 @@
               <td>{{ u.shortUrl }}</td>
               <td class="button-row">
                 <clickToCopy :id="i" :value="u.shortUrl" />
+                <button
+                  class="button qr"
+                  @click="openModal('QRCodeModal', i, {shortUrl: u.shortUrl})">QR</button>
                 <nuxt-link
                   class="button"
                   :to="{ name: 'urls-id', params: { id: u.urlCode } }"
                   >Edit</nuxt-link
                 >
+
+                <div class="modal-mask"
+                     ref="QRCodeModal"
+                     :qrCodeModal.showQRModal="false"
+                     v-show="false">
+                  <div class="modal-wrapper">
+                    <div class="modal-container" :style="[ qrCodeModal.qrModalOptions.color.dark ? { 'background': qrCodeModal.qrModalOptions.color.dark.hex } : '#4f4f4f' ]">
+                      <div class="modal-header">
+                        <h4>QR Code {{ i }} </h4>
+                      </div>
+
+                      <canvas :id="`canvas-${i}`"></canvas>
+
+                      <chrome-picker v-model="qrCodeModal.qrModalOptions.pickerColorsDark" />
+
+                      <div class="modal-footer">
+                        <a
+                          ref="qrDownloadRef"
+                          class="button"
+                          @click="downloadQRCode(u.shortUrl, i)">Download</a>
+
+                        <button
+                          class="button"
+                          @click="closeModal('QRCodeModal', i)">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -198,6 +229,9 @@
 import { mapFields } from "vuex-map-fields";
 import exampleSearch from "~/components/design-system/exampleSearch";
 import clickToCopy from "~/components/design-system/clickToCopy.vue";
+import modal     from '~/components/design-system/modal.vue';
+import QRCode from 'qrcode';
+import { Chrome } from 'vue-color';
 
 import debounce from "lodash.debounce";
 
@@ -223,7 +257,7 @@ export default {
     });
   },
   mounted() {},
-  components: { exampleSearch, clickToCopy },
+  components: { exampleSearch, clickToCopy, modal, 'chrome-picker': Chrome, },
   middleware: "authenticated",
   data() {
     return {
@@ -239,10 +273,31 @@ export default {
       createWhiteListUrlMessage: {
         success: null,
         error: null
-      }
+      },
+      qrCodeModal: {
+        shortUrl: null,
+        index: null,
+        showQRModal:       false,
+        qrModalOptions: {
+          errorCorrectionLevel: 'H',
+          margin: 5,
+          color: {
+            dark: '#4f4f4f',
+            light: '#ffffff',
+          },
+          pickerColorsDark: {},
+        },
+      },
     };
   },
   watch: {
+    'qrCodeModal.qrModalOptions.pickerColorsDark.hex': function(val, oldVal) {
+      if(val != oldVal) {
+        this.qrCodeModal.qrModalOptions.color.dark = val;
+
+        this.qrCodeDisplay(this.qrCodeModal.shortUrl, this.qrCodeModal.index, this.qrCodeModal.qrModalOptions);
+      }
+    },
     addressSearchAuto: debounce(function(val, oldVal) {
       if (this.addressSearchAuto) {
         this.$axios
@@ -327,7 +382,39 @@ export default {
         .catch(err => {
           console.log("deleteWhitelistUrl fail", err);
         });
-    }
+    },
+    qrCodeDisplay(shortUrl, i, options) {
+
+      this.qrCodeModal.shortUrl = shortUrl;
+      this.qrCodeModal.index = i;
+
+      let canvasElm = document.getElementById(`canvas-${i}`);
+
+      QRCode.toCanvas(canvasElm, shortUrl, options, (err, canvas) => {
+        if (err) console.log('QRCode err', err)
+      });
+    },
+    downloadQRCode(shortUrl, i) {
+      let canvasElm = document.getElementById(`canvas-${i}`),
+              image = canvasElm.toDataURL("image/jpg"),
+                  a = document.createElement("a");
+             a.href = image;
+         a.download = shortUrl;
+            a.click();
+    },
+    openModal(modalRef, i, option) {
+      if(modalRef === 'QRCodeModal'){
+        this.$refs.QRCodeModal[i].style.display = "flex";
+        this.qrCodeDisplay(option.shortUrl, i, this.qrCodeModal.qrModalOptions)
+      }
+    },
+    closeModal(modalRef, i) {
+      if(modalRef === 'QRCodeModal'){
+        this.$refs.QRCodeModal[i].style.display = "none";
+        this.qrCodeModal.shortUrl = null;
+        this.qrCodeModal.index = null;
+      }
+    },
   },
   computed: {
     ...mapFields(["systemRoles", "authenticated", "user", "user.user.role"]),
@@ -336,7 +423,7 @@ export default {
     },
     passlistTerm() {
       return process.env.passListTerm;
-    }
+    },
   }
 };
 </script>

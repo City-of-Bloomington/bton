@@ -36,7 +36,9 @@
     "nanoid": "^3.1.10",
     "nuxt": "^2.0.0",
     "path": "^0.12.7",
+    "qrcode": "^1.4.4",
     "valid-url": "^1.0.9",
+    "vue-color": "^2.7.1",
     "vuex-map-fields": "^1.4.0",
     "vuex-persistedstate": "^3.0.1"
   },

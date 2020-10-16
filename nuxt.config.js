@@ -53,7 +53,7 @@ module.exports = {
   plugins: [
     { src: "~/plugins/design-system" },
     { src: "~/plugins/universal-methods" },
-    { src: "~/plugins/google-analytics.js", ssr: false }
+    // { src: "~/plugins/google-analytics.js", ssr: false }
   ],
 
   /*
