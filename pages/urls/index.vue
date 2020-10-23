@@ -85,14 +85,40 @@
                      :qrCodeModal.showQRModal="false"
                      v-show="false">
                   <div class="modal-wrapper">
-                    <div class="modal-container" :style="[ qrCodeModal.qrModalOptions.color.dark ? { 'background': qrCodeModal.qrModalOptions.color.dark.hex } : '#4f4f4f' ]">
+                    <div
+                      class="modal-container"
+                      :style="[ qrCodeModal.qrModalOptions.color.dark ? { 'background': qrCodeModal.qrModalOptions.color.dark.hex } : '#4f4f4f' ]">
                       <div class="modal-header">
                         <h4>QR Code {{ i }} </h4>
                       </div>
 
-                      <canvas :id="`canvas-${i}`"></canvas>
+                      <div class="modal-body">
+              
+                        <div class="canvas-wrapper">
+                          <canvas :id="`canvas-${i}`"></canvas>
 
-                      <chrome-picker v-model="qrCodeModal.qrModalOptions.pickerColorsDark" />
+                          <aside>
+                            <button @click="changeQRColor('light')">Light</button>
+                            <button @click="changeQRColor('dark')">Dark</button>
+                            <button @click="changeQRColor('blue')">Blue</button>
+
+                            <div
+                              class="colorpicker-wrapper" ref="colorpickerWrapper">
+
+                              <input
+                                type="text"
+                                class="colorpicker-picker-input"
+                                @focus="displayColorPicker(true, i)"
+                                :placeholder="qrCodeModal.qrModalOptions.pickerColorsDark.hex">
+                                
+                              <chrome-picker
+                                class="colorpicker-picker"
+                                v-if="showColorPicker"
+                                v-model="qrCodeModal.qrModalOptions.pickerColorsDark" />
+                            </div>
+                          </aside>
+                        </div>
+                      </div>
 
                       <div class="modal-footer">
                         <a
@@ -232,7 +258,7 @@ import clickToCopy from "~/components/design-system/clickToCopy.vue";
 import modal     from '~/components/design-system/modal.vue';
 import QRCode from 'qrcode';
 import { Chrome } from 'vue-color';
-
+import ClickOutside from 'vue-click-outside'
 import debounce from "lodash.debounce";
 
 export default {
@@ -258,6 +284,9 @@ export default {
   },
   mounted() {},
   components: { exampleSearch, clickToCopy, modal, 'chrome-picker': Chrome, },
+  directives: {
+    ClickOutside
+  },
   middleware: "authenticated",
   data() {
     return {
@@ -274,16 +303,17 @@ export default {
         success: null,
         error: null
       },
+      showColorPicker: false,
       qrCodeModal: {
         shortUrl: null,
         index: null,
         showQRModal:       false,
         qrModalOptions: {
           errorCorrectionLevel: 'H',
-          margin: 5,
+          margin: 0,
           color: {
             dark: '#4f4f4f',
-            light: '#ffffff',
+            light: '#0000',
           },
           pickerColorsDark: {},
         },
@@ -383,6 +413,52 @@ export default {
           console.log("deleteWhitelistUrl fail", err);
         });
     },
+    displayColorPicker(bool, index) {
+      console.log('display it index', index)
+      if(bool) {
+        this.showColorPicker = true;
+        document.addEventListener('click', this.documentClick);
+      } else {
+        this.hide();
+      }
+    },
+    changeQRColor(color) {
+      switch(color) {
+        case 'dark':
+          this.qrCodeModal.qrModalOptions.color.dark = '#4f4f4f';
+          this.qrCodeModal.qrModalOptions.pickerColorsDark.hex = '#4f4f4f';
+
+          this.qrCodeDisplay(this.qrCodeModal.shortUrl, this.qrCodeModal.index, this.qrCodeModal.qrModalOptions);
+          break;
+        case 'light':
+          this.qrCodeModal.qrModalOptions.color.dark = '#ffffff';
+          this.qrCodeModal.qrModalOptions.pickerColorsDark.hex = '#ffffff';
+
+          this.qrCodeDisplay(this.qrCodeModal.shortUrl, this.qrCodeModal.index, this.qrCodeModal.qrModalOptions);
+          break;
+        case 'blue':
+          this.qrCodeModal.qrModalOptions.color.dark = '#1e5aae';
+          this.qrCodeModal.qrModalOptions.pickerColorsDark.hex = '#1e5aae';
+
+          this.qrCodeDisplay(this.qrCodeModal.shortUrl, this.qrCodeModal.index, this.qrCodeModal.qrModalOptions);
+          break;
+        default:
+          alert('default color')
+      }
+    },
+    hide() {
+      // this.showColorPicker = false;
+      document.removeEventListener('click', this.documentClick);
+      this.showColorPicker = false;
+    },
+    documentClick(e) {
+
+      let colorPicker = document.querySelector('.colorpicker-picker'),
+      colorPickerInput = document.querySelector('.colorpicker-picker-input');
+
+      if(!colorPicker.contains(e.target) && !colorPickerInput.contains(e.target))  this.hide();
+
+		},
     qrCodeDisplay(shortUrl, i, options) {
 
       this.qrCodeModal.shortUrl = shortUrl;
@@ -393,6 +469,8 @@ export default {
       QRCode.toCanvas(canvasElm, shortUrl, options, (err, canvas) => {
         if (err) console.log('QRCode err', err)
       });
+
+      // if(this.showColorPicker) this.showColorPicker = false;
     },
     downloadQRCode(shortUrl, i) {
       let canvasElm = document.getElementById(`canvas-${i}`),
@@ -438,6 +516,36 @@ main {
   padding: 20px;
   background: white;
   border-radius: $radius-default;
+
+  .colorpicker-wrapper {
+    position: relative;
+
+    input {
+      border: 1px solid $color-grey;
+      border-radius: $radius-default;
+      padding: 2px 5px;
+
+      &::placeholder {
+        letter-spacing: .5px;
+        color: $text-color;
+      }
+    }
+    
+    .vc-chrome {
+      position: absolute;
+      bottom: -120px;
+      right: -160px;
+    }
+  }
+
+  .modal-container {
+    width: 420px;
+  }
+
+  .modal-body {
+    display: flex;
+    overflow: visible !important;
+  }
 
   table {
     color: $text-color;

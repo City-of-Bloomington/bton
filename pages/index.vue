@@ -224,11 +224,6 @@ main {
         outline: none;
         border: 1px solid darken($color-grey, 15%);
       }
-
-      &[type="checkbox"] {
-        appearance: auto;
-        width: auto;
-      }
     }
 
     label {

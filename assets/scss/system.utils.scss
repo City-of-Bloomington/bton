@@ -767,7 +767,7 @@ form {
     }
 
     &[type="checkbox"] {
-      appearance: auto;
+      appearance: checkbox;
       width: auto;
     }
 
@@ -865,12 +865,30 @@ form {
     }
 
     canvas {
-      margin: 0 auto;
+      margin: 0 auto 0 0;
       display: block;
     }
 
     ::v-deep .modal-body {
       max-height: 300px;
+
+      .canvas-wrapper {
+        display: flex;
+        width: 100%;
+        background: $color-grey-lighter;
+        padding: 20px;
+        border-radius: $radius-default * 2;
+
+        aside {
+          margin: 0 0 0 10px;
+
+          button {
+            text-align: left;
+            width: 100%;
+            margin: 0 0 5px 0;
+          }
+        }
+      }
       
       h4 {
         margin: 0 0 5px 0;
