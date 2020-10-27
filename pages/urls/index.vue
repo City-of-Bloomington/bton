@@ -44,7 +44,7 @@
         <table v-if="usersUrls.length" class="users-urls">
           <thead>
             <tr>
-              <th>Hits</th>
+              <!-- <th>Hits</th> -->
               <th>Delay</th>
               <th>Originals</th>
               <th>Shorts</th>
@@ -54,7 +54,7 @@
 
           <tbody>
             <tr v-for="(u, i) in usersUrls" :key="u._id">
-              <td>{{ u.hits }}</td>
+              <!-- <td>{{ u.hits }}</td> -->
               <td>
                 <div>
                   <input
@@ -560,7 +560,7 @@ main {
         }
 
         &:nth-child(2) {
-          width: 55px;
+          // width: 55px;
         }
 
         &:nth-child(3),

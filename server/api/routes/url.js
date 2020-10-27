@@ -7,7 +7,7 @@ const { urls, whitelistUrls } = require("../models/url"),
   router = require("express").Router(),
   validUrl = require("valid-url");
 
-import { nanoid } from "nanoid";
+import { nanoid, customAlphabet } from "nanoid";
 
 // Get all URLs in the system.
 router.get("/urls", authRole(roles.admin, roles.default), async (req, res) => {
@@ -44,27 +44,31 @@ router.get("/url/:id", (req, res) => {
     });
 });
 
-router.get("/url/short/:id", (req, res) => {
-  urls
-    .find({
-      urlCode: {
-        $regex: req.params.id,
-        $options: "i"
-      }
-    })
-    .then(url => {
-      res.status(200).json(url);
-    })
-    .catch(err => {
-      res.status(200).json("URL not found");
-    });
-});
+// router.get("/url/short/:id", (req, res) => {
+//   urls
+//     .find({
+//       urlCode: {
+//         $regex: req.params.id,
+//         $options: "i"
+//       }
+//     })
+//     .then(url => {
+//       res.status(200).json(url);
+//     })
+//     .catch(err => {
+//       res.status(200).json("URL not found");
+//     });
+// });
 
 router.post("/url", authRole(roles.admin, roles.default), (req, res) => {
   if (validUrl.isUri(req.body.url)) {
     console.log("Valid Base Url format");
 
-    const urlCode = nanoid(5);
+    // const urlCode = nanoid(5);
+    const nanoid = customAlphabet('-_~!1234567890aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ', 5);
+
+    let urlCode = nanoid();
+
     let shortUrl = `${process.env.CLIENT_HOST}/${urlCode}`;
 
     const newURL = new urls({

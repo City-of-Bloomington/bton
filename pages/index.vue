@@ -45,7 +45,7 @@
             name="delay-preview"
           />
           <label for="delay-preview">
-            Enable redirect delay (5s) &amp; go-to Url preview?
+            Enable Destination Url preview?
           </label>
         </div>
 

@@ -1,8 +1,8 @@
 <template>
   <main>
-    <fn1-alert v-if="error">{{ error }}</fn1-alert>
+    <fn1-alert v-if="error" variant="warning">{{ error }}</fn1-alert>
 
-    <div class="preview-wrapper">
+    <div class="preview-wrapper" v-if="!error">
       <!-- <template v-if="redirectUrl && delayPreview"> -->
       <template>
         <div class="header">
@@ -42,37 +42,27 @@ import axios from "axios";
 import { mapFields } from "vuex-map-fields";
 
 export default {
+  middleware: ['redirectCheck'],
   layout: "redirect",
   asyncData({ params, error}) {
-    return axios.get(`${process.env.apiHost}/api/short/${params.id}`)
-        .then(res => {
-          return  {
-            redirectUrl: res.data.url,
-            shortUrl: `${process.env.clientHost}/${params.id}`
-          }
-          // redirectUrl = res.url;
-          // shortUrl = `${process.env.clientHost}/${params.id}`;
+    let routeId,
+     rawRouteId = params.id;
 
-          // if (res.delayPreview) {
-          //   vm.delayPreview = true;
+    rawRouteId.endsWith('+') ?
+      routeId = rawRouteId.slice(0, -1) :
+      routeId = params.id;
 
-          //   setInterval(() => {
-          //     if (vm.timeleft <= 0) {
-          //       window.location.href = res.url;
-          //     } else {
-          //       vm.timeleft -= 1;
-          //     }
-          //   }, 500);
-          // } else {
-          //   window.location.href = res.url;
-          // }
-        })
-        .catch(e => {
-          error({
-            statusCode: 404,
-            message: e.res.data,
-          })
-        });
+    return axios.get(`${process.env.apiHost}/api/short/${routeId}`)
+      .then(res => {
+        return  {
+          redirectUrl: res.data.url,
+          delayPreview: res.data.delayPreview,
+          shortUrl: `${process.env.clientHost}/${routeId}`
+        }
+      })
+      .catch(e => {
+        return { error: e.response.data }
+      });
   },
   components: {},
   data() {
@@ -85,7 +75,11 @@ export default {
     };
   },
   watch: {},
-  methods: {},
+  methods: {
+    redirectToUrl(url) {
+      console.log('redirect it',  url)
+    }
+  },
   computed: {}
 };
 </script>
@@ -190,9 +184,10 @@ main {
       border: none;
       border-radius: 3px;
       background-color: $color-fern;
+      border: 1px solid darken($color-fern, 2%);
+      color: white;
+      font-weight: 600;
       font-size: 18px;
-      letter-spacing: 1px;
-      font-weight: 400;
       padding: 10px;
 
       &:hover,
