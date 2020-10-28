@@ -223,7 +223,7 @@ main {
   z-index: 0;
   position: relative;
   top: 140px;
-  width: 840px;
+  width: calc(100% - 40px);
   margin: 0 auto;
   padding: 20px;
   background: white;

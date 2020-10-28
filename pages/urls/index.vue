@@ -73,48 +73,70 @@
                 <clickToCopy :id="i" :value="u.shortUrl" />
                 <button
                   class="button qr"
-                  @click="openModal('QRCodeModal', i, {shortUrl: u.shortUrl})">QR</button>
+                  @click="openModal('QRCodeModal', i, { shortUrl: u.shortUrl })"
+                >
+                  QR
+                </button>
                 <nuxt-link
                   class="button"
                   :to="{ name: 'urls-id', params: { id: u.urlCode } }"
                   >Edit</nuxt-link
                 >
 
-                <div class="modal-mask"
-                     ref="QRCodeModal"
-                     :qrCodeModal.showQRModal="false"
-                     v-show="false">
+                <div
+                  class="modal-mask"
+                  ref="QRCodeModal"
+                  :qrCodeModal.showQRModal="false"
+                  v-show="false"
+                >
                   <div class="modal-wrapper">
                     <div
                       class="modal-container"
-                      :style="[ qrCodeModal.qrModalOptions.color.dark ? { 'background': qrCodeModal.qrModalOptions.color.dark.hex } : '#4f4f4f' ]">
+                      :style="[
+                        qrCodeModal.qrModalOptions.color.dark
+                          ? {
+                              background:
+                                qrCodeModal.qrModalOptions.color.dark.hex
+                            }
+                          : '#4f4f4f'
+                      ]"
+                    >
                       <div class="modal-header">
-                        <h4>QR Code {{ i }} </h4>
+                        <h4>QR Code {{ i }}</h4>
                       </div>
 
                       <div class="modal-body">
-              
                         <div class="canvas-wrapper">
                           <canvas :id="`canvas-${i}`"></canvas>
 
                           <aside>
-                            <button @click="changeQRColor('light')">Light</button>
+                            <button @click="changeQRColor('light')">
+                              Light
+                            </button>
                             <button @click="changeQRColor('dark')">Dark</button>
                             <button @click="changeQRColor('blue')">Blue</button>
 
                             <div
-                              class="colorpicker-wrapper" ref="colorpickerWrapper">
-
+                              class="colorpicker-wrapper"
+                              ref="colorpickerWrapper"
+                            >
                               <input
                                 type="text"
                                 class="colorpicker-picker-input"
                                 @focus="displayColorPicker(true, i)"
-                                :placeholder="qrCodeModal.qrModalOptions.pickerColorsDark.hex">
-                                
+                                :placeholder="
+                                  qrCodeModal.qrModalOptions.pickerColorsDark
+                                    .hex
+                                "
+                              />
+
                               <chrome-picker
                                 class="colorpicker-picker"
                                 v-if="showColorPicker"
-                                v-model="qrCodeModal.qrModalOptions.pickerColorsDark" />
+                                v-model="
+                                  qrCodeModal.qrModalOptions.pickerColorsDark
+                                "
+                              />
                             </div>
                           </aside>
                         </div>
@@ -124,11 +146,16 @@
                         <a
                           ref="qrDownloadRef"
                           class="button"
-                          @click="downloadQRCode(u.shortUrl, i)">Download</a>
+                          @click="downloadQRCode(u.shortUrl, i)"
+                          >Download</a
+                        >
 
                         <button
                           class="button"
-                          @click="closeModal('QRCodeModal', i)">Close</button>
+                          @click="closeModal('QRCodeModal', i)"
+                        >
+                          Close
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -255,10 +282,10 @@
 import { mapFields } from "vuex-map-fields";
 import exampleSearch from "~/components/design-system/exampleSearch";
 import clickToCopy from "~/components/design-system/clickToCopy.vue";
-import modal     from '~/components/design-system/modal.vue';
-import QRCode from 'qrcode';
-import { Chrome } from 'vue-color';
-import ClickOutside from 'vue-click-outside'
+import modal from "~/components/design-system/modal.vue";
+import QRCode from "qrcode";
+import { Chrome } from "vue-color";
+import ClickOutside from "vue-click-outside";
 import debounce from "lodash.debounce";
 
 export default {
@@ -283,7 +310,7 @@ export default {
     });
   },
   mounted() {},
-  components: { exampleSearch, clickToCopy, modal, 'chrome-picker': Chrome, },
+  components: { exampleSearch, clickToCopy, modal, "chrome-picker": Chrome },
   directives: {
     ClickOutside
   },
@@ -307,25 +334,29 @@ export default {
       qrCodeModal: {
         shortUrl: null,
         index: null,
-        showQRModal:       false,
+        showQRModal: false,
         qrModalOptions: {
-          errorCorrectionLevel: 'H',
+          errorCorrectionLevel: "H",
           margin: 0,
           color: {
-            dark: '#4f4f4f',
-            light: '#0000',
+            dark: "#4f4f4f",
+            light: "#0000"
           },
-          pickerColorsDark: {},
-        },
-      },
+          pickerColorsDark: {}
+        }
+      }
     };
   },
   watch: {
-    'qrCodeModal.qrModalOptions.pickerColorsDark.hex': function(val, oldVal) {
-      if(val != oldVal) {
+    "qrCodeModal.qrModalOptions.pickerColorsDark.hex": function(val, oldVal) {
+      if (val != oldVal) {
         this.qrCodeModal.qrModalOptions.color.dark = val;
 
-        this.qrCodeDisplay(this.qrCodeModal.shortUrl, this.qrCodeModal.index, this.qrCodeModal.qrModalOptions);
+        this.qrCodeDisplay(
+          this.qrCodeModal.shortUrl,
+          this.qrCodeModal.index,
+          this.qrCodeModal.qrModalOptions
+        );
       }
     },
     addressSearchAuto: debounce(function(val, oldVal) {
@@ -414,85 +445,98 @@ export default {
         });
     },
     displayColorPicker(bool, index) {
-      console.log('display it index', index)
-      if(bool) {
+      console.log("display it index", index);
+      if (bool) {
         this.showColorPicker = true;
-        document.addEventListener('click', this.documentClick);
+        document.addEventListener("click", this.documentClick);
       } else {
         this.hide();
       }
     },
     changeQRColor(color) {
-      switch(color) {
-        case 'dark':
-          this.qrCodeModal.qrModalOptions.color.dark = '#4f4f4f';
-          this.qrCodeModal.qrModalOptions.pickerColorsDark.hex = '#4f4f4f';
+      switch (color) {
+        case "dark":
+          this.qrCodeModal.qrModalOptions.color.dark = "#4f4f4f";
+          this.qrCodeModal.qrModalOptions.pickerColorsDark.hex = "#4f4f4f";
 
-          this.qrCodeDisplay(this.qrCodeModal.shortUrl, this.qrCodeModal.index, this.qrCodeModal.qrModalOptions);
+          this.qrCodeDisplay(
+            this.qrCodeModal.shortUrl,
+            this.qrCodeModal.index,
+            this.qrCodeModal.qrModalOptions
+          );
           break;
-        case 'light':
-          this.qrCodeModal.qrModalOptions.color.dark = '#ffffff';
-          this.qrCodeModal.qrModalOptions.pickerColorsDark.hex = '#ffffff';
+        case "light":
+          this.qrCodeModal.qrModalOptions.color.dark = "#ffffff";
+          this.qrCodeModal.qrModalOptions.pickerColorsDark.hex = "#ffffff";
 
-          this.qrCodeDisplay(this.qrCodeModal.shortUrl, this.qrCodeModal.index, this.qrCodeModal.qrModalOptions);
+          this.qrCodeDisplay(
+            this.qrCodeModal.shortUrl,
+            this.qrCodeModal.index,
+            this.qrCodeModal.qrModalOptions
+          );
           break;
-        case 'blue':
-          this.qrCodeModal.qrModalOptions.color.dark = '#1e5aae';
-          this.qrCodeModal.qrModalOptions.pickerColorsDark.hex = '#1e5aae';
+        case "blue":
+          this.qrCodeModal.qrModalOptions.color.dark = "#1e5aae";
+          this.qrCodeModal.qrModalOptions.pickerColorsDark.hex = "#1e5aae";
 
-          this.qrCodeDisplay(this.qrCodeModal.shortUrl, this.qrCodeModal.index, this.qrCodeModal.qrModalOptions);
+          this.qrCodeDisplay(
+            this.qrCodeModal.shortUrl,
+            this.qrCodeModal.index,
+            this.qrCodeModal.qrModalOptions
+          );
           break;
         default:
-          alert('default color')
+          alert("default color");
       }
     },
     hide() {
       // this.showColorPicker = false;
-      document.removeEventListener('click', this.documentClick);
+      document.removeEventListener("click", this.documentClick);
       this.showColorPicker = false;
     },
     documentClick(e) {
+      let colorPicker = document.querySelector(".colorpicker-picker"),
+        colorPickerInput = document.querySelector(".colorpicker-picker-input");
 
-      let colorPicker = document.querySelector('.colorpicker-picker'),
-      colorPickerInput = document.querySelector('.colorpicker-picker-input');
-
-      if(!colorPicker.contains(e.target) && !colorPickerInput.contains(e.target))  this.hide();
-
-		},
+      if (
+        !colorPicker.contains(e.target) &&
+        !colorPickerInput.contains(e.target)
+      )
+        this.hide();
+    },
     qrCodeDisplay(shortUrl, i, options) {
-
       this.qrCodeModal.shortUrl = shortUrl;
       this.qrCodeModal.index = i;
 
       let canvasElm = document.getElementById(`canvas-${i}`);
 
       QRCode.toCanvas(canvasElm, shortUrl, options, (err, canvas) => {
-        if (err) console.log('QRCode err', err)
+        if (err) console.log("QRCode err", err);
       });
 
       // if(this.showColorPicker) this.showColorPicker = false;
     },
     downloadQRCode(shortUrl, i) {
       let canvasElm = document.getElementById(`canvas-${i}`),
-              image = canvasElm.toDataURL("image/jpg"),
-                  a = document.createElement("a");
-             a.href = image;
-         a.download = shortUrl;
-            a.click();
+        image = canvasElm.toDataURL("image/jpg"),
+        a = document.createElement("a");
+      a.href = image;
+      a.download = shortUrl;
+      a.click();
     },
     openModal(modalRef, i, option) {
-      if(modalRef === 'QRCodeModal'){
+      if (modalRef === "QRCodeModal") {
         this.$refs.QRCodeModal[i].style.display = "flex";
-        this.qrCodeDisplay(option.shortUrl, i, this.qrCodeModal.qrModalOptions)
+        this.qrCodeDisplay(option.shortUrl, i, this.qrCodeModal.qrModalOptions);
       }
     },
     closeModal(modalRef, i) {
-      if(modalRef === 'QRCodeModal'){
+      if (modalRef === "QRCodeModal") {
         this.$refs.QRCodeModal[i].style.display = "none";
         this.qrCodeModal.shortUrl = null;
         this.qrCodeModal.index = null;
       }
-    },
+    }
   },
   computed: {
     ...mapFields(["systemRoles", "authenticated", "user", "user.user.role"]),
@@ -501,7 +545,7 @@ export default {
     },
     passlistTerm() {
       return process.env.passListTerm;
-    },
+    }
   }
 };
 </script>
@@ -510,8 +554,8 @@ export default {
 main {
   z-index: 0;
   position: relative;
-  top: 140px;
-  width: 840px;
+  top: 120px;
+  width: calc(100% - 40px);
   margin: 0 auto;
   padding: 20px;
   background: white;
@@ -526,11 +570,11 @@ main {
       padding: 2px 5px;
 
       &::placeholder {
-        letter-spacing: .5px;
+        letter-spacing: 0.5px;
         color: $text-color;
       }
     }
-    
+
     .vc-chrome {
       position: absolute;
       bottom: -120px;
@@ -559,14 +603,14 @@ main {
           width: 50px;
         }
 
-        &:nth-child(2) {
-          // width: 55px;
-        }
+        // &:nth-child(2) {
+        //   // width: 55px;
+        // }
 
-        &:nth-child(3),
-        &:nth-child(4) {
-          max-width: 275px;
-        }
+        // &:nth-child(3),
+        // &:nth-child(4) {
+        //   max-width: 275px;
+        // }
       }
     }
 

@@ -17,19 +17,41 @@
         <form @submit.prevent>
           <div class="field-group select" v-if="role">
             <label for="user-role">Role:</label>
-            <select disabled="disabled" v-model="role" name="Role" id="user-role">
-              <option v-for="r, i in userRoles" :key="r" :value="r" v-html="r" />
+            <select
+              disabled="disabled"
+              v-model="role"
+              name="Role"
+              id="user-role"
+            >
+              <option
+                v-for="(r, i) in userRoles"
+                :key="r"
+                :value="r"
+                v-html="r"
+              />
             </select>
           </div>
 
           <div class="field-group" v-if="username">
             <label for="username">Username:</label>
-            <input disabled v-model="username" type="text" id="username" name="Username" />
+            <input
+              disabled
+              v-model="username"
+              type="text"
+              id="username"
+              name="Username"
+            />
           </div>
 
           <div class="field-group" v-if="email">
             <label for="username">Email:</label>
-            <input disabled v-model="email" type="text" id="username" name="Username" />
+            <input
+              disabled
+              v-model="email"
+              type="text"
+              id="username"
+              name="Username"
+            />
           </div>
         </form>
       </div>
@@ -52,11 +74,11 @@ export default {
       "user.user.email",
       "user.user.username",
       "user.user.dateCreated",
-      "user.user.lastLoginDate",
+      "user.user.lastLoginDate"
     ]),
     userRoles() {
       return JSON.parse(process.env.USER_ROLES);
-    },
+    }
   },
   methods: {
     formatDate(date) {
@@ -84,8 +106,8 @@ export default {
         formatedDate = `${month}/${dt}/${year} - ${strTime}`;
 
       return formatedDate;
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -93,11 +115,12 @@ export default {
 main {
   z-index: 0;
   position: relative;
-  background: white;
-  top: 150px;
-  padding: 20px;
-  width: 840px;
+  top: 120px;
+  width: calc(100% - 40px);
   margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: $radius-default;
 
   .row {
     margin: 0 auto;
