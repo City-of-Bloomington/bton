@@ -44,28 +44,35 @@ router.get("/url/:id", (req, res) => {
     });
 });
 
-// router.get("/url/short/:id", (req, res) => {
-//   urls
-//     .find({
-//       urlCode: {
-//         $regex: req.params.id,
-//         $options: "i"
-//       }
-//     })
-//     .then(url => {
-//       res.status(200).json(url);
-//     })
-//     .catch(err => {
-//       res.status(200).json("URL not found");
-//     });
-// });
+router.get("/url/short/:id", (req, res) => {
+  urls
+    .find({
+      urlCode: {
+        $regex: req.params.id,
+        $options: "i"
+      }
+    })
+    .then(url => {
+      if (url.length) {
+        res.status(200).json(url);
+      } else {
+        res.status(404).json({ error: "Short Url not found." });
+      }
+    })
+    .catch(err => {
+      res.status(404).json({ error: "Short Url GET fail." });
+    });
+});
 
 router.post("/url", authRole(roles.admin, roles.default), (req, res) => {
   if (validUrl.isUri(req.body.url)) {
     console.log("Valid Base Url format");
 
     // const urlCode = nanoid(5);
-    const nanoid = customAlphabet('-_~!1234567890aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ', 5);
+    const nanoid = customAlphabet(
+      "-_~!1234567890aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ",
+      5
+    );
 
     let urlCode = nanoid();
 

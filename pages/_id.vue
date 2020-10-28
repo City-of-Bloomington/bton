@@ -26,10 +26,9 @@
         </div>
 
         <div class="footer">
-          <a
-            class="button"
-            :href="redirectUrl"
-            :title="redirectUrl">Continue to Destination Url</a>
+          <a class="button" :href="redirectUrl" :title="redirectUrl"
+            >Continue to Destination Url</a
+          >
         </div>
         <!-- <embed :src="redirectUrl" width="600" height="400" /> -->
       </template>
@@ -42,26 +41,27 @@ import axios from "axios";
 import { mapFields } from "vuex-map-fields";
 
 export default {
-  middleware: ['redirectCheck'],
+  middleware: ["redirectCheck"],
   layout: "redirect",
-  asyncData({ params, error}) {
+  asyncData({ params, error }) {
     let routeId,
-     rawRouteId = params.id;
+      rawRouteId = params.id;
 
-    rawRouteId.endsWith('+') ?
-      routeId = rawRouteId.slice(0, -1) :
-      routeId = params.id;
+    rawRouteId.endsWith("+")
+      ? (routeId = rawRouteId.slice(0, -1))
+      : (routeId = params.id);
 
-    return axios.get(`${process.env.apiHost}/api/short/${routeId}`)
+    return axios
+      .get(`${process.env.apiHost}/api/short/${routeId}`)
       .then(res => {
-        return  {
+        return {
           redirectUrl: res.data.url,
           delayPreview: res.data.delayPreview,
           shortUrl: `${process.env.clientHost}/${routeId}`
-        }
+        };
       })
       .catch(e => {
-        return { error: e.response.data }
+        return { error: e.response.data };
       });
   },
   components: {},
@@ -77,7 +77,7 @@ export default {
   watch: {},
   methods: {
     redirectToUrl(url) {
-      console.log('redirect it',  url)
+      console.log("redirect it", url);
     }
   },
   computed: {}
@@ -162,6 +162,7 @@ main {
 
         li {
           margin: 0 0 10px 0;
+          word-wrap: break-word;
 
           &:last-child {
             margin: 0;

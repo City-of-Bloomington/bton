@@ -1,14 +1,14 @@
 <template>
   <main>
-    <h3>
+    <h3 v-if="!error && data">
       Edit Url Code:
-      <template v-if="url">{{ url.urlCode }}</template>
+      {{ data.urlCode }}
     </h3>
 
     <fn1-alert
-      v-if="editUrlMessage.error || editUrlMessage.success"
+      v-if="editUrlMessage.error || editUrlMessage.success || error"
       :variant="{
-        warning: editUrlMessage.error,
+        warning: editUrlMessage.error || error,
         success: editUrlMessage.success
       }"
     >
@@ -16,19 +16,23 @@
         {{ editUrlMessage.error }}
       </template>
 
+      <template v-if="error">
+        {{ error }}
+      </template>
+
       <template v-if="editUrlMessage.success">
         Saved: {{ editUrlMessage.success.saved }}
       </template>
     </fn1-alert>
 
-    <form v-if="url">
+    <form v-if="data">
       <div class="field-group checkbox">
         <label for="delayPreview">Delay (5s) &amp; go-to Url Preview</label>
         <input
           type="checkbox"
           id="delayPreview"
           name="delayPreview"
-          v-model="url.delayPreview"
+          v-model="data.delayPreview"
         />
       </div>
 
@@ -36,7 +40,7 @@
         <label for="created-date">Created Date</label>
         <input
           disabled="disabled"
-          v-model="url.createdDate"
+          v-model="data.createdDate"
           autocomplete="off"
           id="created-date"
           type="text"
@@ -48,7 +52,7 @@
         <label for="modified-date">Last Modified</label>
         <input
           disabled="disabled"
-          v-model="url.updatedDate"
+          v-model="data.updatedDate"
           autocomplete="off"
           id="modified-date"
           type="text"
@@ -60,7 +64,7 @@
         <label for="url-owner">Owner</label>
         <input
           disabled="disabled"
-          v-model="url.owner"
+          v-model="data.owner"
           autocomplete="off"
           id="url-owner"
           type="text"
@@ -71,7 +75,7 @@
       <div class="field-group">
         <label for="original-url">Original Url</label>
         <input
-          v-model="url.originalUrl"
+          v-model="data.originalUrl"
           autocomplete="off"
           id="original-url"
           type="text"
@@ -83,7 +87,7 @@
         <label for="url-short-code">Url Short Code</label>
         <input
           disabled="disabled"
-          v-model="url.urlCode"
+          v-model="data.urlCode"
           autocomplete="off"
           id="url-short-code"
           type="text"
@@ -99,28 +103,28 @@
 <script>
 import { mapFields } from "vuex-map-fields";
 import debounce from "lodash.debounce";
+import axios from "axios";
 
 export default {
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.$axios
-        .$get(`${process.env.apiHost}/api/url/short/${to.params.id}`, {
-          withCredentials: true
-        })
-        .then(res => {
-          vm.url = res[0];
-        })
-        .catch(err => {
-          console.log("Get URL Fail -", err);
-        });
-    });
+  asyncData({ params }) {
+    return axios
+      .get(`${process.env.apiHost}/api/url/short/${params.id}`, {
+        withCredentials: true
+      })
+      .then(res => {
+        return { data: res.data[0] };
+      })
+      .catch(err => {
+        return { error: err };
+      });
   },
   mounted() {},
   components: {},
   middleware: "authenticated",
   data() {
     return {
-      url: null,
+      data: null,
+      error: null,
       editUrlMessage: {
         success: null,
         error: null
@@ -130,21 +134,19 @@ export default {
   watch: {
     originalUrl: debounce(function(val, oldVal) {
       if (val != oldVal && oldVal != undefined) {
-        // console.log("originalUrl Changed!", val, oldVal);
-
         this.editUrlMessage = {
           success: null,
           error: null
         };
 
         let data = {
-          id: this.url._id,
-          delayPreview: this.url.delayPreview,
-          originalUrl: this.url.originalUrl
+          id: this.data._id,
+          delayPreview: this.data.delayPreview,
+          originalUrl: this.data.originalUrl
         };
 
         this.$axios
-          .$post(`${process.env.apiHost}/api/url/${this.url._id}/edit`, data, {
+          .$post(`${process.env.apiHost}/api/url/${this.data._id}/edit`, data, {
             withCredentials: true
           })
           .then(res => {
@@ -154,27 +156,24 @@ export default {
           .catch(err => {
             this.editUrlMessage.error = err;
             this.editFailMessage;
-            // console.log("Edit URL Fail -", err);
           });
       }
     }, 500),
     delayPreview: debounce(function(val, oldVal) {
       if (val != oldVal && oldVal != undefined) {
-        // console.log("delayPreview Changed!", val, oldVal);
-
         this.editUrlMessage = {
           success: null,
           error: null
         };
 
         let data = {
-          id: this.url._id,
-          delayPreview: this.url.delayPreview,
-          originalUrl: this.url.originalUrl
+          id: this.data._id,
+          delayPreview: this.data.delayPreview,
+          originalUrl: this.data.originalUrl
         };
 
         this.$axios
-          .$post(`${process.env.apiHost}/api/url/${this.url._id}/edit`, data, {
+          .$post(`${process.env.apiHost}/api/url/${this.data._id}/edit`, data, {
             withCredentials: true
           })
           .then(res => {
@@ -184,7 +183,6 @@ export default {
           .catch(err => {
             this.editUrlMessage.error = err;
             this.editFailMessage;
-            // console.log("Edit URL Fail -", err);
           });
       }
     }, 500)
@@ -193,10 +191,10 @@ export default {
   computed: {
     ...mapFields(["systemRoles", "authenticated", "user", "user.user.role"]),
     originalUrl() {
-      if (this.url) return this.url.originalUrl;
+      if (this.data) return this.data.originalUrl;
     },
     delayPreview() {
-      if (this.url) return this.url.delayPreview;
+      if (this.data) return this.data.delayPreview;
     },
     editSuccessMessage() {
       if (this.editUrlMessage) {
