@@ -102,7 +102,7 @@
                       ]"
                     >
                       <div class="modal-header">
-                        <h4>QR Code {{ i }}</h4>
+                        <h4>QR Code: {{ u.urlCode }}</h4>
                       </div>
 
                       <div class="modal-body">
@@ -146,7 +146,7 @@
                         <a
                           ref="qrDownloadRef"
                           class="button"
-                          @click="downloadQRCode(u.shortUrl, i)"
+                          @click="downloadQRCode(u.urlCode, i)"
                           >Download</a
                         >
 
@@ -287,6 +287,7 @@ import QRCode from "qrcode";
 import { Chrome } from "vue-color";
 import ClickOutside from "vue-click-outside";
 import debounce from "lodash.debounce";
+import axios from "axios";
 
 export default {
   beforeRouteEnter(to, from, next) {
@@ -317,10 +318,10 @@ export default {
   middleware: "authenticated",
   data() {
     return {
+      urls: null,
       totalUrls: null,
       limit: 10000,
       skip: 0,
-      urls: null,
       addressSearchAuto: null,
       addressSearchAutoRes: null,
       searchHasFocus: false,
@@ -513,15 +514,13 @@ export default {
       QRCode.toCanvas(canvasElm, shortUrl, options, (err, canvas) => {
         if (err) console.log("QRCode err", err);
       });
-
-      // if(this.showColorPicker) this.showColorPicker = false;
     },
-    downloadQRCode(shortUrl, i) {
+    downloadQRCode(urlCode, i) {
       let canvasElm = document.getElementById(`canvas-${i}`),
         image = canvasElm.toDataURL("image/jpg"),
         a = document.createElement("a");
       a.href = image;
-      a.download = shortUrl;
+      a.download = urlCode;
       a.click();
     },
     openModal(modalRef, i, option) {
