@@ -46,12 +46,7 @@ router.get("/url/:id", (req, res) => {
 
 router.get("/url/short/:id", (req, res) => {
   urls
-    .find({
-      urlCode: {
-        $regex: req.params.id,
-        $options: "i"
-      }
-    })
+    .find({ urlCode: req.params.id })
     .then(url => {
       if (url.length) {
         res.status(200).json(url);
