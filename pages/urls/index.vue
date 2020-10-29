@@ -186,12 +186,96 @@
               <td>{{ u.shortUrl }}</td>
               <td class="button-row">
                 <clickToCopy :id="i" :value="u.shortUrl" />
+                <button
+                  class="button qr"
+                  @click="openModal('allQRCodeModal', i, { shortUrl: u.shortUrl })"
+                >
+                  QR
+                </button>
                 <nuxt-link
                   v-if="role == systemRoles.admin"
                   class="button"
                   :to="{ name: 'urls-id', params: { id: u.urlCode } }"
                   >Edit</nuxt-link
                 >
+
+                <div
+                  class="modal-mask"
+                  ref="allQRCodeModal"
+                  :qrCodeModal.showQRModal="false"
+                  v-show="false"
+                >
+                  <div class="modal-wrapper">
+                    <div
+                      class="modal-container"
+                      :style="[
+                        qrCodeModal.qrModalOptions.color.dark
+                          ? {
+                              background:
+                                qrCodeModal.qrModalOptions.color.dark.hex
+                            }
+                          : '#4f4f4f'
+                      ]"
+                    >
+                      <div class="modal-header">
+                        <h4>QR Code: {{ u.urlCode }}</h4>
+                      </div>
+
+                      <div class="modal-body">
+                        <div class="canvas-wrapper">
+                          <canvas :id="`canvas-${i}${i}`"></canvas>
+
+                          <aside>
+                            <button @click="changeQRColor('light')">
+                              Light
+                            </button>
+                            <button @click="changeQRColor('dark')">Dark</button>
+                            <button @click="changeQRColor('blue')">Blue</button>
+
+                            <div
+                              class="colorpicker-wrapper"
+                              ref="colorpickerWrapper"
+                            >
+                              <input
+                                type="text"
+                                class="colorpicker-picker-input"
+                                @focus="displayColorPicker(true, i)"
+                                :placeholder="
+                                  qrCodeModal.qrModalOptions.pickerColorsDark
+                                    .hex
+                                "
+                              />
+
+                              <chrome-picker
+                                class="colorpicker-picker"
+                                v-if="showColorPicker"
+                                v-model="
+                                  qrCodeModal.qrModalOptions.pickerColorsDark
+                                "
+                              />
+                            </div>
+                          </aside>
+                        </div>
+                      </div>
+
+                      <div class="modal-footer">
+                        <a
+                          ref="qrDownloadRef"
+                          class="button"
+                          @click="downloadQRCode(u.urlCode, `${i}${i}`)"
+                          >Download</a
+                        >
+
+                        <button
+                          class="button"
+                          @click="closeModal('allQRCodeModal', i)"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -528,10 +612,21 @@ export default {
         this.$refs.QRCodeModal[i].style.display = "flex";
         this.qrCodeDisplay(option.shortUrl, i, this.qrCodeModal.qrModalOptions);
       }
+
+      if (modalRef === "allQRCodeModal") {
+        this.$refs.allQRCodeModal[i].style.display = "flex";
+        this.qrCodeDisplay(option.shortUrl, `${i}${i}`, this.qrCodeModal.qrModalOptions);
+      } 
     },
     closeModal(modalRef, i) {
       if (modalRef === "QRCodeModal") {
         this.$refs.QRCodeModal[i].style.display = "none";
+        this.qrCodeModal.shortUrl = null;
+        this.qrCodeModal.index = null;
+      }
+
+      if (modalRef === "allQRCodeModal") {
+        this.$refs.allQRCodeModal[i].style.display = "none";
         this.qrCodeModal.shortUrl = null;
         this.qrCodeModal.index = null;
       }
