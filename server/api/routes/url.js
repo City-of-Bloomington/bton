@@ -28,6 +28,28 @@ router.get("/urls", authRole(roles.admin, roles.default), async (req, res) => {
   }
 });
 
+
+// Get all URLs in the system via Username.
+router.get("/urls/user/:id", authRole(roles.admin, roles.default), async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit); // Make sure to parse the limit to number
+    const skip = parseInt(req.query.skip); // Make sure to parse the skip to number
+
+    const username = req.params.id;
+
+    let urlRes = await urls
+      .find({ owner: username})
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    let totalUrls = await urls.countDocuments({ owner: username });
+
+    res.status(200).json({ urlRes, total: totalUrls });
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 router.get("/url/:id", (req, res) => {
   urls
     .find({

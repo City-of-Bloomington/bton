@@ -39,8 +39,8 @@
       </table>
     </div>
 
-    <fn1-tabs v-if="urls && !searchHasFocus">
-      <fn1-tab name="Your Urls" :selected="true">
+    <fn1-tabs v-if="!searchHasFocus">
+      <fn1-tab v-if="usersUrls" name="Your Urls" :selected="true">
         <table v-if="usersUrls.length" class="users-urls">
           <thead>
             <tr>
@@ -166,9 +166,16 @@
         </table>
 
         <p v-else><strong>Sorry,</strong> you don't have any URLs yet.</p>
+
+        <examplePagination
+          v-if="usersUrls.length"
+          :total="totalUsersUrls"
+          :per-page="limit"
+          :current-page="currentUsersPage"
+          @pagechanged="onUsersPageChange" />
       </fn1-tab>
 
-      <fn1-tab name="All Urls">
+      <fn1-tab v-if="urls" name="All Urls">
         <table v-if="urls.length" class="all-urls">
           <thead>
             <tr>
@@ -282,6 +289,13 @@
         </table>
 
         <p v-else><strong>Sorry,</strong> the system looks empty.</p>
+
+        <examplePagination
+          v-if="urls.length"
+          :total="totalUrls"
+          :per-page="limit"
+          :current-page="currentPage"
+          @pagechanged="onPageChange" />
       </fn1-tab>
 
       <fn1-tab
@@ -365,6 +379,7 @@
 <script>
 import { mapFields } from "vuex-map-fields";
 import exampleSearch from "~/components/design-system/exampleSearch";
+import examplePagination from "~/components/design-system/examplePagination";
 import clickToCopy from "~/components/design-system/clickToCopy.vue";
 import modal from "~/components/design-system/modal.vue";
 import QRCode from "qrcode";
@@ -392,10 +407,25 @@ export default {
         .catch(err => {
           console.log("Get URLs Fail -", err);
         });
+
+      vm.$axios
+        .$get(
+          `${process.env.apiHost}/api/urls/user/${vm.user.user.username}?limit=${vm.limit}&skip=${vm.skip}`,
+          {
+            withCredentials: true
+          }
+        )
+        .then(res => {
+          vm.usersUrls = res.urlRes;
+          vm.totalUsersUrls = res.total;
+        })
+        .catch(err => {
+          console.log("Get URLs Fail -", err);
+        });
     });
   },
   mounted() {},
-  components: { exampleSearch, clickToCopy, modal, "chrome-picker": Chrome },
+  components: { examplePagination, exampleSearch, clickToCopy, modal, "chrome-picker": Chrome },
   directives: {
     ClickOutside
   },
@@ -403,9 +433,18 @@ export default {
   data() {
     return {
       urls: null,
+      usersUrls: null,
+
       totalUrls: null,
-      limit: 10000,
+      totalUsersUrls: null,
+      
+      currentPage: 1,
+      currentUsersPage: 1,
+
+      limit: 10,
       skip: 0,
+      skipUser: 0,
+
       addressSearchAuto: null,
       addressSearchAutoRes: null,
       searchHasFocus: false,
@@ -469,6 +508,44 @@ export default {
       setTimeout(() => {
         this.searchHasFocus = false;
       }, 200);
+    },
+    onUsersPageChange(page) {
+      this.skipUser = page * this.limit - this.limit;
+      this.currentUsersPage = page;
+
+      this.$axios
+        .$get(
+          `${process.env.apiHost}/api/urls/user/${this.user.user.username}?limit=${this.limit}&skip=${this.skipUser}`,
+          {
+            withCredentials: true
+          }
+        )
+        .then(res => {
+          this.usersUrls = res.urlRes;
+          this.totalUsersUrls = res.total;
+        })
+        .catch(err => {
+          console.log("Get URLs Fail -", err);
+        });
+    },
+    onPageChange(page) {
+      this.skip = page * this.limit - this.limit;
+      this.currentPage = page;
+
+      this.$axios
+        .$get(
+          `${process.env.apiHost}/api/urls?limit=${this.limit}&skip=${this.skip}`,
+          {
+            withCredentials: true
+          }
+        )
+        .then(res => {
+          this.urls = res.urlRes;
+          this.totalUrls = res.total;
+        })
+        .catch(err => {
+          console.log("Get URLs Fail -", err);
+        });
     },
     deleteURL(id) {
       this.$axios
@@ -634,9 +711,9 @@ export default {
   },
   computed: {
     ...mapFields(["systemRoles", "authenticated", "user", "user.user.role"]),
-    usersUrls() {
-      return this.urls.filter(url => url.owner === this.user.user.username);
-    },
+    // usersUrls() {
+    //   return this.urls.filter(url => url.owner === this.user.user.username);
+    // },
     passlistTerm() {
       return process.env.passListTerm;
     }
