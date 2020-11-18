@@ -1,5 +1,6 @@
 module.exports = {
   mode: "universal",
+  telemetry: false,
 
   env: {
     apiHost: process.env.API_HOST,

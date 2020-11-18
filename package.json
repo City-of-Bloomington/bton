@@ -2,7 +2,7 @@
   "name": "BtonShortURLs",
   "prettyName": "Bton Short URLs",
   "company": "City of Bloomington, Indiana - ITS",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Shorten City of Bloomington URLs using Bton.",
   "author": "adabutch",
   "repository": {
@@ -40,6 +40,7 @@
     "valid-url": "^1.0.9",
     "vue-click-outside": "^1.1.0",
     "vue-color": "^2.7.1",
+    "vue-meta": "^2.4.0",
     "vuex-map-fields": "^1.4.0",
     "vuex-persistedstate": "^3.0.1"
   },

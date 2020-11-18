@@ -122,7 +122,7 @@
                             >
                               <input
                                 type="text"
-                                class="colorpicker-picker-input"
+                                :class="`colorpicker-picker-input-${i}`"
                                 @focus="displayColorPicker(true, i)"
                                 :placeholder="
                                   qrCodeModal.qrModalOptions.pickerColorsDark
@@ -131,7 +131,7 @@
                               />
 
                               <chrome-picker
-                                class="colorpicker-picker"
+                                :class="`colorpicker-picker-${i}`"
                                 v-if="showColorPicker"
                                 v-model="
                                   qrCodeModal.qrModalOptions.pickerColorsDark
@@ -245,8 +245,8 @@
                             >
                               <input
                                 type="text"
-                                class="colorpicker-picker-input"
-                                @focus="displayColorPicker(true, i)"
+                                :class="`colorpicker-picker-input-${i}${i}`"
+                                @focus="displayColorPicker(true, `${i}${i}`)"
                                 :placeholder="
                                   qrCodeModal.qrModalOptions.pickerColorsDark
                                     .hex
@@ -254,7 +254,7 @@
                               />
 
                               <chrome-picker
-                                class="colorpicker-picker"
+                                :class="`colorpicker-picker-${i}${i}`"
                                 v-if="showColorPicker"
                                 v-model="
                                   qrCodeModal.qrModalOptions.pickerColorsDark
@@ -607,7 +607,7 @@ export default {
         });
     },
     displayColorPicker(bool, index) {
-      console.log("display it index", index);
+      console.log("display it index", index, bool);
       if (bool) {
         this.showColorPicker = true;
         document.addEventListener("click", this.documentClick);
@@ -657,14 +657,18 @@ export default {
       this.showColorPicker = false;
     },
     documentClick(e) {
-      let colorPicker = document.querySelector(".colorpicker-picker"),
-        colorPickerInput = document.querySelector(".colorpicker-picker-input");
+      console.log(e.target);
+
+      let colorPicker = document.querySelector(`.colorpicker-picker-${this.qrCodeModal.index}`),
+        colorPickerInput = document.querySelector(`.colorpicker-picker-input-${this.qrCodeModal.index}`);
 
       if (
         !colorPicker.contains(e.target) &&
         !colorPickerInput.contains(e.target)
-      )
+      ) {
         this.hide();
+        this.showColorPicker = false;
+      }
     },
     qrCodeDisplay(shortUrl, i, options) {
       this.qrCodeModal.shortUrl = shortUrl;
@@ -686,11 +690,13 @@ export default {
     },
     openModal(modalRef, i, option) {
       if (modalRef === "QRCodeModal") {
+        console.log('QRCodeModal', i)
         this.$refs.QRCodeModal[i].style.display = "flex";
         this.qrCodeDisplay(option.shortUrl, i, this.qrCodeModal.qrModalOptions);
       }
 
       if (modalRef === "allQRCodeModal") {
+        console.log('allQRCodeModal', `${i}${i}`)
         this.$refs.allQRCodeModal[i].style.display = "flex";
         this.qrCodeDisplay(option.shortUrl, `${i}${i}`, this.qrCodeModal.qrModalOptions);
       } 
@@ -733,6 +739,7 @@ main {
   border-radius: $radius-default;
 
   .colorpicker-wrapper {
+    
     position: relative;
 
     input {
@@ -747,6 +754,7 @@ main {
     }
 
     .vc-chrome {
+      z-index: 10000000;
       position: absolute;
       bottom: -120px;
       right: -160px;
