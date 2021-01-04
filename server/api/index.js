@@ -58,6 +58,8 @@ app.use(session(
   }
 ));
 
+
+
 app.use('/auth', authRoutes);
 app.use('/api', apiRoutes);
 

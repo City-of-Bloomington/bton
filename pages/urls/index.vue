@@ -389,40 +389,32 @@ import debounce from "lodash.debounce";
 import axios from "axios";
 
 export default {
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.getNewWhitelistUrl();
+  async fetch(){
+    const cookieRes = this.$cookies.getAll();
 
-      vm.$axios
-        .$get(
-          `${process.env.apiHost}/api/urls?limit=${vm.limit}&skip=${vm.skip}`,
-          {
-            withCredentials: true
-          }
-        )
-        .then(res => {
-          vm.urls = res.urlRes;
-          vm.totalUrls = res.total;
-        })
-        .catch(err => {
-          console.log("Get URLs Fail -", err);
-        });
-
-      vm.$axios
-        .$get(
-          `${process.env.apiHost}/api/urls/user/${vm.user.user.username}?limit=${vm.limit}&skip=${vm.skip}`,
-          {
-            withCredentials: true
-          }
-        )
-        .then(res => {
-          vm.usersUrls = res.urlRes;
-          vm.totalUsersUrls = res.total;
-        })
-        .catch(err => {
-          console.log("Get URLs Fail -", err);
-        });
+    // same as getNewWhitelistUrl()
+    const whitelistRes = await axios.get(`${process.env.apiHost}/api/urls/whitelist`, {
+      withCredentials: true,
+      headers: { Cookie: `sid=${cookieRes.sid}` }
     });
+
+    this.whitelistedUrls = whitelistRes.data.urlRes;
+
+    const urls = await axios.get(`${process.env.apiHost}/api/urls?limit=${this.limit}&skip=${this.skip}`, {
+      withCredentials: true,
+      headers: { Cookie: `sid=${cookieRes.sid}` }
+    });
+
+    this.urls = urls.data.urlRes;
+    this.totalUrls = urls.data.total;
+
+    const usersUrls = await axios.get(`${process.env.apiHost}/api/urls/user/${this.user.user.username}?limit=${this.limit}&skip=${this.skip}`, {
+      withCredentials: true,
+      headers: { Cookie: `sid=${cookieRes.sid}` }
+    });
+
+    this.usersUrls = usersUrls.data.urlRes;
+    this.totalUsersUrls = usersUrls.data.total;
   },
   mounted() {},
   components: { examplePagination, exampleSearch, clickToCopy, modal, "chrome-picker": Chrome },
@@ -432,6 +424,8 @@ export default {
   middleware: "authenticated",
   data() {
     return {
+      cookiez: [],
+      
       urls: null,
       usersUrls: null,
 
@@ -587,7 +581,7 @@ export default {
         })
         .then(res => {
           this.whitelistedUrls = res.urlRes;
-          console.log("getNewWhitelistUrl res", res.urlRes);
+          console.log("getNewWhitelistUrl res 1", res.urlRes);
         })
         .catch(err => {
           console.log("getNewWhitelistUrl fail", err);

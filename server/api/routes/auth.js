@@ -98,8 +98,8 @@ router.get("/verify", (req, res, next) => {
 });
 
 router.get("/user", (req, res) => {
-  console.log("req.session", req.session);
-  console.log("req.session.user", req.session.user);
+  // console.log("req.session", req.session);
+  // console.log("req.session.user", req.session.user);
   // console.log('req.session.user.user', req.session.user.user);
 
   if (req.session.user) {

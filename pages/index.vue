@@ -67,31 +67,29 @@
 </template>
 
 <script>
+import axios from "axios";
 import { mapFields } from "vuex-map-fields";
 import clickToCopy from "~/components/design-system/clickToCopy.vue";
 
 export default {
   components: { clickToCopy },
   middleware: "authenticated",
-  beforeRouteEnter(to, from, next) {
-    next(vm => {
-      vm.$axios
-        .$get(`${process.env.apiHost}/api/urls/whitelist`, {
-          withCredentials: true
-        })
-        .then(res => {
-          let whitelistRes = [...res.urlRes],
-            result = whitelistRes.filter(res => res.url).map(ele => ele.url);
+  async fetch(){
+    const cookieRes = this.$cookies.getAll();
 
-          vm.whitelist = result;
-        })
-        .catch(err => {
-          console.log("Get URLs Fail -", err);
-        });
+    const whitelistRes = await axios.get(`${process.env.apiHost}/api/urls/whitelist`, {
+      withCredentials: true,
+      headers: { Cookie: `sid=${cookieRes.sid}` }
     });
+
+    let whitelistArray = [ ...whitelistRes.data.urlRes ],
+            result = whitelistArray.filter(res => res.url).map(ele => ele.url);
+
+    this.whitelist = result;
   },
   data() {
     return {
+      radical: null,
       whitelist: null,
       passWhitelist: false,
       createPostMessage: {

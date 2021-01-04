@@ -122,7 +122,6 @@ export const actions = {
         headers: { Cookie: `sid=${cookieRes.sid}` }
       })
       .then(res => {
-        console.log("nuxtServerInitt", res.data);
 
         commit("SET_USER", res.data);
         commit("SET_AUTHENTICATED", res.data.isLoggedIn);
@@ -130,7 +129,7 @@ export const actions = {
         return Promise.resolve();
       })
       .catch(err => {
-        console.log("nuxtServerInit", err);
+        console.log("nuxtServerInit Err", err);
         return Promise.reject();
       });
   }

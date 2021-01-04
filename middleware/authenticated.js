@@ -1,5 +1,5 @@
 export default function ({ store, redirect }) {
-  console.log('NUXT MW - Authenticated ::', store.state.authenticated);
+  // console.log('NUXT MW - Authenticated ::', store.state.authenticated);
 
   // If the user is not authenticated
   if (!store.state.authenticated) {
