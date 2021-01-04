@@ -19,6 +19,7 @@ router.get("/urls", authRole(roles.admin, roles.default), async (req, res) => {
       .find()
       .skip(skip)
       .limit(limit)
+      .sort({ createdDate: -1 })
       .exec();
     let totalUrls = await urls.countDocuments();
 
@@ -41,6 +42,7 @@ router.get("/urls/user/:id", authRole(roles.admin, roles.default), async (req, r
       .find({ owner: username})
       .skip(skip)
       .limit(limit)
+      .sort({ createdDate: -1 })
       .exec();
     let totalUrls = await urls.countDocuments({ owner: username });
 
@@ -270,7 +272,7 @@ router.get(
   authRole(roles.admin, roles.default),
   async (req, res) => {
     try {
-      let urlRes = await whitelistUrls.find().exec();
+      let urlRes = await whitelistUrls.find().sort({ createdDate: -1 }).exec();
       let totalUrls = await whitelistUrls.countDocuments();
 
       res.status(200).json({ urlRes, total: totalUrls });
