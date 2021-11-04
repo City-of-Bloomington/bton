@@ -1,5 +1,4 @@
 module.exports = {
-  mode: "universal",
   telemetry: false,
 
   env: {
@@ -13,7 +12,9 @@ module.exports = {
   },
 
   head: {
-    title: process.env.npm_package_name || "",
+    title:
+      `${process.env.npm_package_name} | City of Bloomington, Indiana` ||
+      "City of Bloomington, Indiana",
     meta: [
       { charset: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -39,10 +40,16 @@ module.exports = {
 
   modules: [
     "@nuxtjs/axios",
-    "@nuxtjs/pwa",
     "@nuxtjs/dotenv",
     "@nuxtjs/style-resources",
-    "cookie-universal-nuxt"
+    "cookie-universal-nuxt",
+    [
+      "@nuxtjs/pwa",
+      {
+        icon: true,
+        sizes: [16, 120, 144, 152, 192, 384, 512]
+      }
+    ]
   ],
 
   css: ["assets/scss/style.scss"],
@@ -53,7 +60,7 @@ module.exports = {
 
   plugins: [
     { src: "~/plugins/design-system" },
-    { src: "~/plugins/universal-methods" },
+    { src: "~/plugins/universal-methods" }
     // { src: "~/plugins/google-analytics.js", ssr: false }
   ],
 
