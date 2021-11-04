@@ -45,7 +45,10 @@
             <td>{{ r.originalUrl }}</td>
             <td>{{ r.shortUrl }}</td>
             <td class="button-row">
-              <clickToCopy :id="i" :value="r.shortUrl" />
+              <clickToCopy
+                :id="r._id"
+                :value="r.delayPreview ? `${r.shortUrl}+` : r.shortUrl"
+              />
             </td>
           </tr>
         </tbody>
@@ -84,7 +87,10 @@
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td class="button-row">
-                <clickToCopy :id="i" :value="u.shortUrl" />
+                <clickToCopy
+                  :id="u._id"
+                  :value="u.delayPreview ? `${u.shortUrl}+` : u.shortUrl"
+                />
                 <button
                   class="button qr"
                   @click="openModal('QRCodeModal', i, { shortUrl: u.shortUrl })"
@@ -220,7 +226,10 @@
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td class="button-row">
-                <clickToCopy :id="i" :value="u.shortUrl" />
+                <clickToCopy
+                  :id="u._id"
+                  :value="u.delayPreview ? `${u.shortUrl}+` : u.shortUrl"
+                />
                 <button
                   class="button qr"
                   @click="
