@@ -29,28 +29,31 @@ router.get("/urls", authRole(roles.admin, roles.default), async (req, res) => {
   }
 });
 
-
 // Get all URLs in the system via Username.
-router.get("/urls/user/:id", authRole(roles.admin, roles.default), async (req, res) => {
-  try {
-    const limit = parseInt(req.query.limit); // Make sure to parse the limit to number
-    const skip = parseInt(req.query.skip); // Make sure to parse the skip to number
+router.get(
+  "/urls/user/:id",
+  authRole(roles.admin, roles.default),
+  async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit); // Make sure to parse the limit to number
+      const skip = parseInt(req.query.skip); // Make sure to parse the skip to number
 
-    const username = req.params.id;
+      const username = req.params.id;
 
-    let urlRes = await urls
-      .find({ owner: username})
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdDate: -1 })
-      .exec();
-    let totalUrls = await urls.countDocuments({ owner: username });
+      let urlRes = await urls
+        .find({ owner: username })
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdDate: -1 })
+        .exec();
+      let totalUrls = await urls.countDocuments({ owner: username });
 
-    res.status(200).json({ urlRes, total: totalUrls });
-  } catch (error) {
-    res.status(500).send(error);
+      res.status(200).json({ urlRes, total: totalUrls });
+    } catch (error) {
+      res.status(500).send(error);
+    }
   }
-});
+);
 
 router.get("/url/:id", (req, res) => {
   urls
@@ -102,6 +105,7 @@ router.post("/url", authRole(roles.admin, roles.default), (req, res) => {
       originalUrl: req.body.url,
       urlCode: urlCode,
       shortUrl: shortUrl,
+      label: req.body.label,
       delayPreview: req.body.delayPreview,
       createdDate: new Date(),
       updatedDate: new Date()
@@ -130,6 +134,7 @@ router.post(
         $set: {
           delayPreview: req.body.delayPreview,
           originalUrl: req.body.originalUrl,
+          label: req.body.label,
           updatedDate: new Date()
         }
       };
@@ -272,7 +277,10 @@ router.get(
   authRole(roles.admin, roles.default),
   async (req, res) => {
     try {
-      let urlRes = await whitelistUrls.find().sort({ createdDate: -1 }).exec();
+      let urlRes = await whitelistUrls
+        .find()
+        .sort({ createdDate: -1 })
+        .exec();
       let totalUrls = await whitelistUrls.countDocuments();
 
       res.status(200).json({ urlRes, total: totalUrls });

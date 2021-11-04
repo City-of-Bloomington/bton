@@ -2,7 +2,7 @@
   <main>
     <section class="search">
       <form @submit.prevent="submitURL()">
-        <label for="tool-search">Shorten a URL</label>
+        <legend for="tool-search">Shorten a URL</legend>
         <p>
           <small>
             <strong>Note:</strong> Only {{ passlistTerm }} Urls allowed.
@@ -32,35 +32,68 @@
           </template>
 
           <template v-if="createPostMessage.success">
-            {{ createPostMessage.success.shortUrl }}
-            <clickToCopy :id="0" :value="createPostMessage.success.shortUrl" />
+            <template v-if="createPostMessage.success.delayPreview">
+              {{ createPostMessage.success.shortUrl }}+
+              <clickToCopy
+                :id="0"
+                :value="`${createPostMessage.success.shortUrl}+`"
+              />
+            </template>
+
+            <template v-else>
+              {{ createPostMessage.success.shortUrl }}
+              <clickToCopy
+                :id="0"
+                :value="createPostMessage.success.shortUrl"
+              />
+            </template>
           </template>
         </fn1-alert>
 
         <div class="field-group checkbox">
+          <label for="delay-preview">
+            Enable Destination Url preview?
+          </label>
+
           <input
             type="checkbox"
             v-model="urlDelay"
             id="delay-preview"
             name="delay-preview"
           />
-          <label for="delay-preview">
-            Enable Destination Url preview?
-          </label>
         </div>
 
         <div class="field-group">
+          <label for="url-label">
+            Label
+          </label>
+
+          <input
+            v-model="urlLabel"
+            autocomplete="off"
+            id="url-label"
+            type="search"
+            name="url-label"
+            placeholder="Lunch Menu"
+          />
+        </div>
+
+        <div class="field-group">
+          <label for="create-url">
+            Url
+          </label>
+
           <input
             v-model="urlInput"
             autocomplete="off"
-            id="tool-search"
+            id="reate-url"
             type="search"
-            name="tool-search"
+            name="reate-url"
             placeholder="eg. https://bloomington.in.gov/ureport"
           />
-
-          <input type="submit" value="Shorten Url" />
         </div>
+
+        <input type="submit" value="Shorten Url" />
       </form>
     </section>
   </main>
@@ -74,16 +107,19 @@ import clickToCopy from "~/components/design-system/clickToCopy.vue";
 export default {
   components: { clickToCopy },
   middleware: "authenticated",
-  async fetch(){
+  async fetch() {
     const cookieRes = this.$cookies.getAll();
 
-    const whitelistRes = await axios.get(`${process.env.apiHost}/api/urls/whitelist`, {
-      withCredentials: true,
-      headers: { Cookie: `sid=${cookieRes.sid}` }
-    });
+    const whitelistRes = await axios.get(
+      `${process.env.apiHost}/api/urls/whitelist`,
+      {
+        withCredentials: true,
+        headers: { Cookie: `sid=${cookieRes.sid}` }
+      }
+    );
 
-    let whitelistArray = [ ...whitelistRes.data.urlRes ],
-            result = whitelistArray.filter(res => res.url).map(ele => ele.url);
+    let whitelistArray = [...whitelistRes.data.urlRes],
+      result = whitelistArray.filter(res => res.url).map(ele => ele.url);
 
     this.whitelist = result;
   },
@@ -96,7 +132,8 @@ export default {
         success: null,
         error: null
       },
-      urlInput: null,
+      urlInput: "",
+      urlLabel: "",
       urlDelay: false
     };
   },
@@ -125,14 +162,15 @@ export default {
           this.$axios
             .$post(
               `${process.env.apiHost}/api/url`,
-              { url: url, delayPreview: this.urlDelay },
+              { url: url, delayPreview: this.urlDelay, label: this.urlLabel },
               {
                 withCredentials: true
               }
             )
             .then(res => {
               this.createPostMessage.success = res;
-              this.urlInput = null;
+              this.urlInput = "";
+              this.urlLabel = "";
               this.urlDelay = false;
             })
             .catch(err => {
@@ -190,74 +228,13 @@ main {
     }
   }
 
-  .field-group {
-    &.checkbox {
-      align-items: center;
-
-      input {
-        margin: 0 10px 0 0;
-      }
-
-      label {
-        border-bottom: none;
-        color: lighten($text-color, 15%);
-        font-weight: 600;
-        font-size: 14px;
-        margin: 0;
-        padding: 0;
-      }
-    }
-  }
-
   form {
-    input {
-      box-shadow: none;
-      margin: 0 0 15px 0;
-      border: 1px solid darken($color-grey, 5%);
-      border-radius: $radius-default !important;
-
-      &:hover,
-      &:focus {
-        box-shadow: none;
-        outline: none;
-        border: 1px solid darken($color-grey, 15%);
-      }
-    }
-
-    label {
-      display: block;
-      color: $text-color;
-      font-weight: 600;
-      font-size: 28px;
-      margin: 0 0 10px 0;
-      padding: 0 0 10px 0;
-      border-bottom: 1px solid $color-grey;
-    }
-
-    p {
-      color: lighten($text-color, 15%);
-      margin: 0 0 10px 0;
-
-      small {
-        color: lighten($text-color, 15%);
-        font-weight: 600;
-        font-size: 14px;
-
-        strong {
-          color: $text-color;
-        }
-      }
-    }
-
     input[type="submit"] {
-      cursor: pointer;
-      background: $color-fern;
-      border: 1px solid darken($color-fern, 2%);
-      color: white;
+      margin: 20px 0 0 0;
       width: 100%;
       font-weight: 600;
       font-size: 18px;
-      margin: 0;
+      padding: 8px 16px 9px;
     }
   }
 }

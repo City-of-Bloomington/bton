@@ -37,6 +37,40 @@
       </div>
 
       <div class="field-group">
+        <label for="url-label">Url Label</label>
+        <input
+          v-model="data.label"
+          autocomplete="off"
+          id="url-label"
+          type="text"
+          name="url-label"
+        />
+      </div>
+
+      <div class="field-group">
+        <label for="original-url">Original Url</label>
+        <input
+          v-model="data.originalUrl"
+          autocomplete="off"
+          id="original-url"
+          type="text"
+          name="original-url"
+        />
+      </div>
+
+      <div class="field-group">
+        <label for="url-short-code">Url Short Code</label>
+        <input
+          disabled="disabled"
+          v-model="data.urlCode"
+          autocomplete="off"
+          id="url-short-code"
+          type="text"
+          name="url-short-code"
+        />
+      </div>
+
+      <div class="field-group">
         <label for="created-date">Created Date</label>
         <input
           disabled="disabled"
@@ -69,29 +103,6 @@
           id="url-owner"
           type="text"
           name="url-owner"
-        />
-      </div>
-
-      <div class="field-group">
-        <label for="original-url">Original Url</label>
-        <input
-          v-model="data.originalUrl"
-          autocomplete="off"
-          id="original-url"
-          type="text"
-          name="original-url"
-        />
-      </div>
-
-      <div class="field-group">
-        <label for="url-short-code">Url Short Code</label>
-        <input
-          disabled="disabled"
-          v-model="data.urlCode"
-          autocomplete="off"
-          id="url-short-code"
-          type="text"
-          name="url-short-code"
         />
       </div>
 
@@ -142,6 +153,7 @@ export default {
         let data = {
           id: this.data._id,
           delayPreview: this.data.delayPreview,
+          label: this.data.label,
           originalUrl: this.data.originalUrl
         };
 
@@ -169,6 +181,7 @@ export default {
         let data = {
           id: this.data._id,
           delayPreview: this.data.delayPreview,
+          label: this.data.label,
           originalUrl: this.data.originalUrl
         };
 
@@ -185,7 +198,35 @@ export default {
             this.editFailMessage;
           });
       }
-    }, 500)
+    }, 500),
+    label: debounce(function(val, oldVal) {
+      if (val != oldVal && oldVal != undefined) {
+        this.editUrlMessage = {
+          success: null,
+          error: null
+        };
+
+        let data = {
+          id: this.data._id,
+          label: this.data.label,
+          delayPreview: this.data.delayPreview,
+          originalUrl: this.data.originalUrl
+        };
+
+        this.$axios
+          .$post(`${process.env.apiHost}/api/url/${this.data._id}/edit`, data, {
+            withCredentials: true
+          })
+          .then(res => {
+            this.editUrlMessage.success = res;
+            this.editSuccessMessage;
+          })
+          .catch(err => {
+            this.editUrlMessage.error = err;
+            this.editFailMessage;
+          });
+      }
+    }, 1000)
   },
   methods: {},
   computed: {
@@ -195,6 +236,9 @@ export default {
     },
     delayPreview() {
       if (this.data) return this.data.delayPreview;
+    },
+    label() {
+      if (this.data) return this.data.label;
     },
     editSuccessMessage() {
       if (this.editUrlMessage) {

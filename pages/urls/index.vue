@@ -16,19 +16,32 @@
     </div>
 
     <div class="search-results" v-if="addressSearchAutoRes && searchHasFocus">
-      <table>
+      <table class="search-table">
         <thead>
           <tr>
-            <!-- <th>Hits</th> -->
-            <th>Originals</th>
-            <th>Shorts</th>
+            <th>Preview</th>
+            <th>Label</th>
+            <th>Original</th>
+            <th>Short</th>
             <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
           <tr v-for="(r, i) in addressSearchAutoRes" :key="r._id">
-            <!-- <td>{{ r.hits }}</td> -->
+            <td>
+              <div>
+                <input
+                  disabled="disabled"
+                  type="checkbox"
+                  id="delayPreview"
+                  name="delayPreview"
+                  v-model="r.delayPreview"
+                />
+                <label for="delayPreview" class="sr-only">Delay</label>
+              </div>
+            </td>
+            <td>{{ r.label }}</td>
             <td>{{ r.originalUrl }}</td>
             <td>{{ r.shortUrl }}</td>
             <td class="button-row">
@@ -44,10 +57,10 @@
         <table v-if="usersUrls.length" class="users-urls">
           <thead>
             <tr>
-              <!-- <th>Hits</th> -->
-              <th>Delay</th>
-              <th>Originals</th>
-              <th>Shorts</th>
+              <th>Preview</th>
+              <th>Label</th>
+              <th>Original</th>
+              <th>Short</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -67,6 +80,7 @@
                   <label for="delayPreview" class="sr-only">Delay</label>
                 </div>
               </td>
+              <td>{{ u.label }}</td>
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td class="button-row">
@@ -172,30 +186,46 @@
           :total="totalUsersUrls"
           :per-page="limit"
           :current-page="currentUsersPage"
-          @pagechanged="onUsersPageChange" />
+          @pagechanged="onUsersPageChange"
+        />
       </fn1-tab>
 
       <fn1-tab v-if="urls" name="All Urls">
         <table v-if="urls.length" class="all-urls">
           <thead>
             <tr>
-              <!-- <th>Hits</th> -->
-              <th>Originals</th>
-              <th>Shorts</th>
+              <th>Preview</th>
+              <th>Label</th>
+              <th>Original</th>
+              <th>Short</th>
               <th>Actions</th>
             </tr>
           </thead>
 
           <tbody>
             <tr v-for="(u, i) in urls" :key="u._id">
-              <!-- <td>{{ u.hits }}</td> -->
+              <td>
+                <div>
+                  <input
+                    disabled="disabled"
+                    type="checkbox"
+                    id="delayPreview"
+                    name="delayPreview"
+                    v-model="u.delayPreview"
+                  />
+                  <label for="delayPreview" class="sr-only">Delay</label>
+                </div>
+              </td>
+              <td>{{ u.label }}</td>
               <td>{{ u.originalUrl }}</td>
               <td>{{ u.shortUrl }}</td>
               <td class="button-row">
                 <clickToCopy :id="i" :value="u.shortUrl" />
                 <button
                   class="button qr"
-                  @click="openModal('allQRCodeModal', i, { shortUrl: u.shortUrl })"
+                  @click="
+                    openModal('allQRCodeModal', i, { shortUrl: u.shortUrl })
+                  "
                 >
                   QR
                 </button>
@@ -295,7 +325,8 @@
           :total="totalUrls"
           :per-page="limit"
           :current-page="currentPage"
-          @pagechanged="onPageChange" />
+          @pagechanged="onPageChange"
+        />
       </fn1-tab>
 
       <fn1-tab
@@ -389,35 +420,50 @@ import debounce from "lodash.debounce";
 import axios from "axios";
 
 export default {
-  async fetch(){
+  async fetch() {
     const cookieRes = this.$cookies.getAll();
 
     // same as getNewWhitelistUrl()
-    const whitelistRes = await axios.get(`${process.env.apiHost}/api/urls/whitelist`, {
-      withCredentials: true,
-      headers: { Cookie: `sid=${cookieRes.sid}` }
-    });
+    const whitelistRes = await axios.get(
+      `${process.env.apiHost}/api/urls/whitelist`,
+      {
+        withCredentials: true,
+        headers: { Cookie: `sid=${cookieRes.sid}` }
+      }
+    );
 
     this.whitelistedUrls = whitelistRes.data.urlRes;
 
-    const urls = await axios.get(`${process.env.apiHost}/api/urls?limit=${this.limit}&skip=${this.skip}`, {
-      withCredentials: true,
-      headers: { Cookie: `sid=${cookieRes.sid}` }
-    });
+    const urls = await axios.get(
+      `${process.env.apiHost}/api/urls?limit=${this.limit}&skip=${this.skip}`,
+      {
+        withCredentials: true,
+        headers: { Cookie: `sid=${cookieRes.sid}` }
+      }
+    );
 
     this.urls = urls.data.urlRes;
     this.totalUrls = urls.data.total;
 
-    const usersUrls = await axios.get(`${process.env.apiHost}/api/urls/user/${this.user.user.username}?limit=${this.limit}&skip=${this.skip}`, {
-      withCredentials: true,
-      headers: { Cookie: `sid=${cookieRes.sid}` }
-    });
+    const usersUrls = await axios.get(
+      `${process.env.apiHost}/api/urls/user/${this.user.user.username}?limit=${this.limit}&skip=${this.skip}`,
+      {
+        withCredentials: true,
+        headers: { Cookie: `sid=${cookieRes.sid}` }
+      }
+    );
 
     this.usersUrls = usersUrls.data.urlRes;
     this.totalUsersUrls = usersUrls.data.total;
   },
   mounted() {},
-  components: { examplePagination, exampleSearch, clickToCopy, modal, "chrome-picker": Chrome },
+  components: {
+    examplePagination,
+    exampleSearch,
+    clickToCopy,
+    modal,
+    "chrome-picker": Chrome
+  },
   directives: {
     ClickOutside
   },
@@ -425,13 +471,13 @@ export default {
   data() {
     return {
       cookiez: [],
-      
+
       urls: null,
       usersUrls: null,
 
       totalUrls: null,
       totalUsersUrls: null,
-      
+
       currentPage: 1,
       currentUsersPage: 1,
 
@@ -653,8 +699,12 @@ export default {
     documentClick(e) {
       console.log(e.target);
 
-      let colorPicker = document.querySelector(`.colorpicker-picker-${this.qrCodeModal.index}`),
-        colorPickerInput = document.querySelector(`.colorpicker-picker-input-${this.qrCodeModal.index}`);
+      let colorPicker = document.querySelector(
+          `.colorpicker-picker-${this.qrCodeModal.index}`
+        ),
+        colorPickerInput = document.querySelector(
+          `.colorpicker-picker-input-${this.qrCodeModal.index}`
+        );
 
       if (
         !colorPicker.contains(e.target) &&
@@ -684,16 +734,20 @@ export default {
     },
     openModal(modalRef, i, option) {
       if (modalRef === "QRCodeModal") {
-        console.log('QRCodeModal', i)
+        console.log("QRCodeModal", i);
         this.$refs.QRCodeModal[i].style.display = "flex";
         this.qrCodeDisplay(option.shortUrl, i, this.qrCodeModal.qrModalOptions);
       }
 
       if (modalRef === "allQRCodeModal") {
-        console.log('allQRCodeModal', `${i}${i}`)
+        console.log("allQRCodeModal", `${i}${i}`);
         this.$refs.allQRCodeModal[i].style.display = "flex";
-        this.qrCodeDisplay(option.shortUrl, `${i}${i}`, this.qrCodeModal.qrModalOptions);
-      } 
+        this.qrCodeDisplay(
+          option.shortUrl,
+          `${i}${i}`,
+          this.qrCodeModal.qrModalOptions
+        );
+      }
     },
     closeModal(modalRef, i) {
       if (modalRef === "QRCodeModal") {
@@ -733,7 +787,6 @@ main {
   border-radius: $radius-default;
 
   .colorpicker-wrapper {
-    
     position: relative;
 
     input {
@@ -767,13 +820,23 @@ main {
   table {
     color: $text-color;
 
-    &.users-urls {
+    &.users-urls,
+    &.all-urls,
+    &.search-table {
       table-layout: fixed;
 
       th,
       td {
-        &:first-child {
-          width: 50px;
+        &:nth-child(1) {
+          width: 70px;
+        }
+
+        &:nth-child(2) {
+          width: 150px;
+        }
+
+        &:nth-child(3) {
+          word-break: break-all;
         }
 
         // &:nth-child(2) {
@@ -788,8 +851,6 @@ main {
     }
 
     td {
-      word-wrap: break-word;
-
       &.button-row {
         width: 100%;
         display: flex;

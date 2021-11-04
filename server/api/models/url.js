@@ -4,10 +4,11 @@ const mongoose = require("mongoose"),
   Schema = mongoose.Schema;
 
 const urlsSchema = new Schema({
-  owner: String,
-  originalUrl: String,
-  urlCode: String,
-  shortUrl: String,
+  owner: { type: String, required: true },
+  originalUrl: { type: String, required: true, unique: true },
+  urlCode: { type: String, required: true, unique: true },
+  shortUrl: { type: String, required: true, unique: true },
+  label: { type: String, default: "" },
   delayPreview: { type: Boolean, default: false },
   hits: { type: Number, default: 0 },
   createdDate: { type: Date, default: Date.now },
@@ -19,16 +20,6 @@ urlsSchema.pre("save", function(next) {
 
   urls.find({ originalUrl: self.originalUrl }, function(err, docs) {
     if (!docs.length) {
-      // whitelistUrls.find({ url: self.originalUrl }, function(err, url) {
-      //   if (!url.length) {
-      //     next({
-      //       message: `Url not ${process.env.PASSLIST_TERM} accepted.`,
-      //       url: null
-      //     });
-      //   } else {
-      //     next();
-      //   }
-      // });
       next();
     } else {
       next({ message: "Url already exists.", url: docs });
@@ -37,7 +28,7 @@ urlsSchema.pre("save", function(next) {
 });
 
 const whitelistUrlsSchema = new Schema({
-  url: { type: String, required: true },
+  url: { type: String, required: true, unique: true },
   owner: { type: String, required: true },
   createdDate: { type: Date, default: Date.now }
 });

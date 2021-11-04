@@ -101,3 +101,5 @@ certs
 # Old &/or backup files
 *.old
 *.bak
+
+dumps
